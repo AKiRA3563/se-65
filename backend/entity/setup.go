@@ -15,7 +15,7 @@ func DB() *gorm.DB {
 
 }
 
-func SetuoDatabase () {
+func SetupDatabase() {
 
 	database, err := gorm.Open(sqlite.Open("se-65.db"), &gorm.Config{})
 
