@@ -10,7 +10,7 @@ import (
 // POST	/diagnosis_records
 func CreateDiagnosisRecord(c *gin.Context) {
 	
-	var patient			entity.PatientRegistered
+	var patient			entity.PatientRegister
 	var employee		entity.Employee
 	var historysheet	entity.HistorySheet
 	var disease			entity.Disease

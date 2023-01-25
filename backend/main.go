@@ -1,11 +1,14 @@
 package main
 
 import (
+	
+	//"github.com/AKiRA3563/se-65/controller"
+	controller_diagnosis "github.com/AKiRA3563/se-65/controller/Diagnosis"
+	controller_treatment "github.com/AKiRA3563/se-65/controller/Treatment"
 
+	//"github.com/AKiRA3563/se-65/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/AKiRA3563/se-65/entity"
-	"github.com/AKiRA3563/se-65/controller"
-	//"github.com/AKiRA3563/se-65/middlewares"
 )
 
 const PORT = "8080"
@@ -22,18 +25,18 @@ func main() {
 		// router.Use(middlewares.Authorizes())
 		// {
 			// DiagonsisRecord Routes
-			router.GET("/diagnosis_records", controller.ListDiagnosisRecord)
-			router.GET("/diagnosisrecords/:id", controller.GetDiagnosisRecord)
-			router.POST("/diagnosis_record", controller.CreateDiagnosisRecord)
-			router.PATCH("/diagnosis_records", controller.UpdateDiagnosisRecord)
-			router.DELETE("/diagnosisrecords/:id", controller.DeleteDiagnosisRecord)
+			router.GET("/diagnosis_records", controller_diagnosis.ListDiagnosisRecord)
+			router.GET("/diagnosisrecords/:id", controller_diagnosis.GetDiagnosisRecord)
+			router.POST("/diagnosis_record", controller_diagnosis.CreateDiagnosisRecord)
+			router.PATCH("/diagnosis_records", controller_diagnosis.UpdateDiagnosisRecord)
+			router.DELETE("/diagnosisrecords/:id", controller_diagnosis.DeleteDiagnosisRecord)
 
 			// TreatmentRecord Routes
-			router.GET("/treatment_records", controller.ListTreatmentRecord)
-			router.GET("/treatmentrecord/:id", controller.GetTreatmentRecord)
-			router.POST("/treatment_records", controller.CreateTreatmentRecord)
-			router.PATCH("/treatment_records", controller.UpdateTreatmentRecord)
-			router.DELETE("/treatmentrecords/:id", controller.DeleteTreatmentRecord)
+			router.GET("/treatment_records", controller_treatment.ListTreatmentRecord)
+			router.GET("/treatmentrecord/:id", controller_treatment.GetTreatmentRecord)
+			router.POST("/treatment_records", controller_treatment.CreateTreatmentRecord)
+			router.PATCH("/treatment_records", controller_treatment.UpdateTreatmentRecord)
+			router.DELETE("/treatmentrecords/:id", controller_treatment.DeleteTreatmentRecord)
 
 		// }
 	}

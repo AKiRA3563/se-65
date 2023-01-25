@@ -30,8 +30,8 @@ func SetupDatabase() {
 		&DiagnosisRecord{},
 		&TreatmentRecord{},
 		&HistorySheet{},
-		&MedicineRecord{},
-		&PatientRegistered{},
+		&Medicine{},
+		&PatientRegister{},
 		&TreatmentRecord{},
 	)
 

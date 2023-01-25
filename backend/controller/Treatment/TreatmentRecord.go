@@ -10,10 +10,10 @@ import (
 // Post /treament_records
 func CreateTreatmentRecord(c *gin.Context) {
 
-	var patient			entity.PatientRegistered
+	var patient			entity.PatientRegister
 	var employee		entity.Employee
 	var diagnosisrecord entity.DiagnosisRecord
-	var medicinerecord	entity.MedicineRecord
+	var medicine	entity.Medicine
 	var treatmentrecord	entity.TreatmentRecord
 
 	
@@ -34,8 +34,8 @@ func CreateTreatmentRecord(c *gin.Context) {
 		return
 	}
 
-	//ค้นหา MedicineRecord ด้วย id
-	if tx := entity.DB().Where("id = ?", treatmentrecord.MedicineRecordID).First(&medicinerecord); tx.RowsAffected == 0 {
+	//ค้นหา Medicine ด้วย id
+	if tx := entity.DB().Where("id = ?", treatmentrecord.MedicineID).First(&medicine); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "medicine not found"})
 		return
 	}
@@ -45,7 +45,7 @@ func CreateTreatmentRecord(c *gin.Context) {
 		Patient:			patient,
 		Doctor:				employee,
 		DiagnosisRecord:	diagnosisrecord,
-		MedicineRecord:		medicinerecord,
+		Medicine:			medicine,
 		MedicineQuantity:	treatmentrecord.MedicineQuantity,
 		Treatment:			treatmentrecord.Treatment,
 		Date:				treatmentrecord.Date,
@@ -78,7 +78,7 @@ func ListTreatmentRecord(c *gin.Context) {
 		Preload("patient").
 		Preload("doctor").
 		Preload("diagnosisrecord").
-		Preload("medicinerecord").
+		Preload("medicine").
 		Find(&treatmentrecords).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
