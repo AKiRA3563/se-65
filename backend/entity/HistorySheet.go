@@ -24,7 +24,7 @@ type HistorySheet struct {
 	PatientRegister   PatientRegister `gorm:"references:ID"`
 
 	NurseID *uint
-	Nurse   Nurse `gorm:"references:ID"`
+	Nurse   Employee `gorm:"references:ID"`
 
 	DrugAllergyID *uint
 	DrugAllergy   DrugAllergy `gorm:"references:ID"`

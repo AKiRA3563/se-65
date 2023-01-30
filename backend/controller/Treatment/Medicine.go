@@ -37,7 +37,7 @@ func GetMedicineRecord(c *gin.Context) {
 // GET /medicines
 func ListMedicines(c *gin.Context) {
 	var medicines []entity.Medicine
-	if err := entity.DB().Raw("SELECT * FROM videos").Find(&medicines).Error; err != nil {
+	if err := entity.DB().Raw("SELECT * FROM medicines").Find(&medicines).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -48,7 +48,7 @@ func ListMedicines(c *gin.Context) {
 // DELETE /medicines/:id
 func DeleteMedicineRecord(c *gin.Context) {
 	id := c.Param("id")
-	if tx := entity.DB().Exec("DELETE FROM resolutions WHERE id = ?", id); tx.RowsAffected == 0 {
+	if tx := entity.DB().Exec("DELETE FROM medicines WHERE id = ?", id); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "medicine not found"})
 		return
 	}

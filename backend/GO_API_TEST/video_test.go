@@ -1,4 +1,4 @@
-package goapitest
+package entity
 
 import (
 	"testing"

@@ -54,4 +54,7 @@ type Employee struct {
 	//BloodTypeID ทำหน้าที่ FK
 	Salary 	uint8
 	BirthDay    time.Time
+
+	Doctor []Employee `gorm:"foreignKey:DoctorID"`
+	Nurse	[]Employee	`gorm:"foreignKey:NurseID"`
 }

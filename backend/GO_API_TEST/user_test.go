@@ -1,4 +1,4 @@
-package goapitest
+package entity
 
 import (
 	"testing"
@@ -51,4 +51,4 @@ func TestUserValidate(t *testing.T) {
 	// 	g.Expect(err.Error()).To(gomega.Equal("Email: not vaild"))
 
 	// })
-}
+} 

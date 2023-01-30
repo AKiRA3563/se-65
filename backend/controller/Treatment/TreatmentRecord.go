@@ -13,7 +13,7 @@ func CreateTreatmentRecord(c *gin.Context) {
 	var patient			entity.PatientRegister
 	var employee		entity.Employee
 	var diagnosisrecord entity.DiagnosisRecord
-	var medicine	entity.Medicine
+	var medicine		entity.Medicine
 	var treatmentrecord	entity.TreatmentRecord
 
 	

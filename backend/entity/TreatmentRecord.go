@@ -23,6 +23,7 @@ type TreatmentRecord struct {
 
 	Treatment			string
 	Note				string
+	Appointment			*bool
 	
 	//MedicineID เป็น FK
 	MedicineID			*uint

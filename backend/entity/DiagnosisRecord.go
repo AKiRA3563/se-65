@@ -36,7 +36,7 @@ type DiagnosisRecord struct {
 	Disease				Disease			`gorm:"references:ID"`
 	
 	Examination			string
-	MedicalCertificate 	bool	
+	MedicalCertificate 	*bool	
 	Date				time.Time
 
 }
