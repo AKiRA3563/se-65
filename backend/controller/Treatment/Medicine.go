@@ -23,7 +23,7 @@ func CreateMedicine(c *gin.Context) {
 }
 
 // GET /medicine/:id
-func GetMedicineRecord(c *gin.Context) {
+func GetMedicine(c *gin.Context) {
 	var medicine entity.Medicine
 	id := c.Param("id")
 	if tx := entity.DB().Where("id = ?", id).First(&medicine); tx.RowsAffected == 0 {
@@ -46,7 +46,7 @@ func ListMedicines(c *gin.Context) {
 }
 
 // DELETE /medicines/:id
-func DeleteMedicineRecord(c *gin.Context) {
+func DeleteMedicine(c *gin.Context) {
 	id := c.Param("id")
 	if tx := entity.DB().Exec("DELETE FROM medicines WHERE id = ?", id); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "medicine not found"})
@@ -57,7 +57,7 @@ func DeleteMedicineRecord(c *gin.Context) {
 }
 
 // PATCH /medicines
-func UpdateResolution(c *gin.Context) {
+func UpdateMedicine(c *gin.Context) {
 	var medicine entity.Medicine
 	if err := c.ShouldBindJSON(&medicine); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
