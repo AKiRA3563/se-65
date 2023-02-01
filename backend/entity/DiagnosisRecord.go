@@ -10,7 +10,6 @@ type Disease struct {
 	gorm.Model
 
 	Name		string
-	Description	string
 
 	DiagnosisRecords	[]DiagnosisRecord	`gorm:"foreignKey:DiseaseID"`
 }

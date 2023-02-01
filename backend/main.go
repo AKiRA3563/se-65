@@ -1,14 +1,17 @@
 package main
 
 import (
-	
+
 	//"github.com/AKiRA3563/se-65/controller"
+	//	controller "github.com/AKiRA3563/se-65/controller/Diagnosis"
 	controller_diagnosis "github.com/AKiRA3563/se-65/controller/Diagnosis"
 	controller_treatment "github.com/AKiRA3563/se-65/controller/Treatment"
+	controller_employee "github.com/AKiRA3563/se-65/controller/Employee"
+	controller_patient "github.com/AKiRA3563/se-65/controller/Patient"
 
 	//"github.com/AKiRA3563/se-65/middlewares"
-	"github.com/gin-gonic/gin"
 	"github.com/AKiRA3563/se-65/entity"
+	"github.com/gin-gonic/gin"
 )
 
 const PORT = "8080"
@@ -37,7 +40,23 @@ func main() {
 			router.POST("/treatment_records", controller_treatment.CreateTreatmentRecord)
 			router.PATCH("/treatment_records", controller_treatment.UpdateTreatmentRecord)
 			router.DELETE("/treatmentrecords/:id", controller_treatment.DeleteTreatmentRecord)
+			
+			// Disease Routes
+			router.GET("/diseases", controller_diagnosis.ListDisease)
+			router.GET("/disease/:id", controller_diagnosis.GetDisease)
+			router.POST("/diseases", controller_diagnosis.CreateDisease)
+			router.PATCH("/diseases", controller_diagnosis.UpdateDisease)
+			router.DELETE("/diseases/:id", controller_diagnosis.DeleteDisease)
+			
+			// Medicine Routes
+			router.GET("/medicines", controller_treatment.ListMedicines)
+			router.GET("/medicine/:id", controller_treatment.GetMedicine)
+			router.POST("/medicines", controller_treatment.CreateMedicine)
+			router.PATCH("/medicines", controller_treatment.UpdateMedicine)
+			router.DELETE("/medicines/:id", controller_treatment.DeleteMedicine)
 
+			router.GET("/employee", controller_employee.ListEmployee)
+			router.GET("/employee/:id", controller_employee.GetEmployee)
 		// }
 	}
 

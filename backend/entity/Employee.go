@@ -41,7 +41,8 @@ type Employee struct {
 	//TitleID ทำหน้าที่ FK
 	TitleID *uint
 	Title   Title
-	Name    string
+	FirstName   string
+	LastName	string
 	//RoleID ทำหน้าที่ FK
 	RoleID  *uint
 	Role    Role
