@@ -40,7 +40,6 @@ type Medicine struct {
 
 	Name		string
 	Description	string
-	Quantity 	int
 
-	TreatmentRecords	[]TreatmentRecord	`gorm:"foreignKey:MedicineID"`
+	TreatmentRecord	[]TreatmentRecord	`gorm:"foreignKey:MedicineID"`
 }

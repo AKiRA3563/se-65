@@ -20,11 +20,8 @@ func DB() *gorm.DB {
 func SetupDatabase() {
 
 	database, err := gorm.Open(sqlite.Open("se-65.db"), &gorm.Config{})
-
 	if err != nil {
-
 		panic("failed to connect database")
-
 	}
 
 	// Migrate the schema
@@ -32,6 +29,7 @@ func SetupDatabase() {
 		&DiagnosisRecord{},
 		&TreatmentRecord{},
 		&HistorySheet{},
+		&Disease{},
 		&Medicine{},
 		&Employee{},
 		&PatientRegister{},
@@ -41,33 +39,44 @@ func SetupDatabase() {
 	db = database
 
 	// Disease Data
-	db.Model(&Disease{}).Create([]map[string]interface{}{
-		{"Name": "ไม่มี"},
-		{"Name": "ไข้หวัดใหญ่"},
-		{"Name": "ไข้เลือดออก"},
-		{"Name": "ไข้ หรือ ไข้ไม่ทราบสาเหตุ"},
-		{"Name": "ติดเชื้อระบบทางเดินอาหารจากแบคทีเรียชนิดเฉียบพลัน"},
-		{"Name": "ทางเดินอาหารอักเสบเฉียบพลันจากไวรัส"},
-		{"Name": "พิษสุนัขบ้า"},
-		{"Name": "พิษจากแก๊ส สารไอระเหย"},
-		{"Name": "มาลาเรีย"},
-		{"Name": "โรคตาแดง โรคตาอักเสบ"},
+	Disease1 := Disease{
+		Name: "ไม่มี",
+	}
+	db.Model(&Disease{}).Create(Disease1)
 
-		{"Name": "โรคเบาหวาน"},
-		{"Name": "โรคเพศสัมพันธุ์อื่น ๆ"},
-		{"Name": "โรคภูมิแพ้"},
-		{"Name": "อาหารเป็นพิษ"},
-		{"Name": "เอดส์"},
-	})
+	// db.Model(&Disease{}).Create([]map[string]interface{}{
+	// 	{"Name": "ไข้หวัดใหญ่"},
+	// 	{"Name": "ไข้เลือดออก"},
+	// 	{"Name": "ไข้ หรือ ไข้ไม่ทราบสาเหตุ"},
+	// 	{"Name": "ติดเชื้อระบบทางเดินอาหารจากแบคทีเรียชนิดเฉียบพลัน"},
+	// 	{"Name": "ทางเดินอาหารอักเสบเฉียบพลันจากไวรัส"},
+	// 	{"Name": "พิษสุนัขบ้า"},
+	// 	{"Name": "พิษจากแก๊ส สารไอระเหย"},
+	// 	{"Name": "มาลาเรีย"},
+	// 	{"Name": "โรคตาแดง โรคตาอักเสบ"},
 
-	db.Model(&Medicine{}).Create([]map[string]interface{}{
-		{"Name": "ไม่มี", "Description": "none", "Quantity": 0},
-		{"Name": "Paracetamol", "Description": "ใช้บรรเทาปวด ลดไข้", "Quantity": 100},
-		{"Name": "Antacil Gel", "Description": "บรรเทาอาการปวดท้อง ท้องอืด จุกเสียด แน่น", "Quantity": 100},
-		// {"Name": "", "Description": "", "Quantity": 100},
-		// {"Name": "", "Description": "", "Quantity": 100},
-		// {"Name": "", "Description": "", "Quantity": 100},
-	})
+	// 	{"Name": "โรคเบาหวาน"},
+	// 	{"Name": "โรคเพศสัมพันธุ์อื่น ๆ"},
+	// 	{"Name": "โรคภูมิแพ้"},
+	// 	{"Name": "อาหารเป็นพิษ"},
+	// 	{"Name": "เอดส์"},
+	// })
+
+
+	// Medicine Data
+	Medicine1 := Medicine{
+		Name: "ไม่มี", 
+		Description: "none",
+	}
+	db.Model(&Medicine{}).Create(Medicine1)
+
+	// db.Model(&Medicine{}).Create([]map[string]interface{}{
+	// 	{"Name": "Paracetamol", "Description": "ใช้บรรเทาปวด ลดไข้",},
+	// 	{"Name": "Antacil Gel", "Description": "บรรเทาอาการปวดท้อง ท้องอืด จุกเสียด แน่น",},
+	// 	// {"Name": "", "Description": "",},
+	// 	// {"Name": "", "Description": "",},
+	// 	// {"Name": "", "Description": "",},
+	// })
 
 
 	password, err := bcrypt.GenerateFromPassword([]byte("qwerty"), 14)

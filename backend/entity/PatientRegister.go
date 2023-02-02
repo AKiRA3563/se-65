@@ -14,4 +14,7 @@ type PatientRegister struct {
 	Mobile		string	`gorm:"uniqueIndex"`
 	Email		string	`gorm:"uniqueIndex"`
 
+	DiagnosisRecord []DiagnosisRecord `gorm:"foreignKey:PatientID"`
+	TreatmentRecord	[]TreatmentRecord `gorm:"foreignKey:PatientID"`
+	HistorySheet	[]HistorySheet	`gorm:"foreignKey:PatientID"`
 }

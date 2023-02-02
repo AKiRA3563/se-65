@@ -3,11 +3,9 @@ package main
 import (
 
 	//"github.com/AKiRA3563/se-65/controller"
-	//	controller "github.com/AKiRA3563/se-65/controller/Diagnosis"
+	controller "github.com/AKiRA3563/se-65/controller"
 	controller_diagnosis "github.com/AKiRA3563/se-65/controller/Diagnosis"
 	controller_treatment "github.com/AKiRA3563/se-65/controller/Treatment"
-	controller_employee "github.com/AKiRA3563/se-65/controller/Employee"
-	controller_patient "github.com/AKiRA3563/se-65/controller/Patient"
 
 	//"github.com/AKiRA3563/se-65/middlewares"
 	"github.com/AKiRA3563/se-65/entity"
@@ -55,8 +53,11 @@ func main() {
 			router.PATCH("/medicines", controller_treatment.UpdateMedicine)
 			router.DELETE("/medicines/:id", controller_treatment.DeleteMedicine)
 
-			router.GET("/employee", controller_employee.ListEmployee)
-			router.GET("/employee/:id", controller_employee.GetEmployee)
+			router.GET("/employee", controller.ListEmployee)
+			router.GET("/employee/:id", controller.GetEmployee)
+
+			router.GET("/patient", controller.ListPatient)
+			router.GET("/patient/:id", controller.GetPatient)
 		// }
 	}
 
