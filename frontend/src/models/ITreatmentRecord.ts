@@ -1,13 +1,15 @@
 import { DiagnosisRecordInterface } from "./IDiagnosisRecord";
+import { EmployeeInterface } from "./IEmployee";
+import { PatientRegisterInterface } from "./IPatientRegister";
 
 export interface TreatmentRecordInterface {
-    No?: number;
+    ID?: number;
 
-    PatientID?: number;
-	//Patient?: PatientRegisterInterface;
+    // PatientRegisterID?: number;
+    // PatientRegister?:   PatientRegisterInterface;
 
 	DoctorID?: number;
-	//Doctor?: EmployeeInterface;
+	Doctor?: EmployeeInterface;
 
     DiagnosisRecordID?: number;
     DiagnosisRecord?:   DiagnosisRecordInterface;
@@ -18,14 +20,15 @@ export interface TreatmentRecordInterface {
     MedicineQuantity?: number;
     Treatment?: string;
     Note?: string;
-    Appointment?: boolean;//int;
+    
+    Appointment?: boolean | null;
     Date?: Date | null;
 }
 
 export interface MedicineInterface {
-    ID?: number;
+    ID: number;
 
-    Name?: string;
-    Description?: string;
-    Quantity?: number;
+    Name: string;
+    Description: string;
+    Price: number;
 }

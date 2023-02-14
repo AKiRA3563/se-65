@@ -7,14 +7,18 @@ import (
 type PatientRegister struct {
 	gorm.Model
 
-	Prefix		string
+	//Prefix		string
 	FirstName	string
 	LastName	string
+
+	GenderID	*uint
+	Gender		Gender	`gorm:"references:ID"`
+	
 	Age			int
 	Mobile		string	`gorm:"uniqueIndex"`
 	Email		string	`gorm:"uniqueIndex"`
 
-	DiagnosisRecord []DiagnosisRecord `gorm:"foreignKey:PatientID"`
-	TreatmentRecord	[]TreatmentRecord `gorm:"foreignKey:PatientID"`
-	HistorySheet	[]HistorySheet	`gorm:"foreignKey:PatientID"`
+	HistorySheets	[]HistorySheet	`gorm:"foreignKey:PatientRegisterID"`
+	// DiagnosisRecords	[]DiagnosisRecord	`gorm:"foreignKey:PatientRegisterID"`		
+	// TreatmentRecords	[]TreatmentRecord	`gorm:"foreignKey:PatientRegisterID"`
 }

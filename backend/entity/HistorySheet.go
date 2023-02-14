@@ -10,15 +10,14 @@ type HistorySheet struct {
 	gorm.Model
 	Weight                 float32
 	Height                 float32
-	BMI                    float32
 	Temperature            float32
-	SystolicBloodPressure  uint16
-	DiastolicBloodPressure uint16
+	// SystolicBloodPressure  uint16
+	// DiastolicBloodPressure uint16
 	HeartRate              uint8
-	RespiratoryRate        uint8
+	// RespiratoryRate        uint8
 	OxygenSaturation       uint8
-	DrugAllergySymtom      string
-	Symtom                 string
+	// DrugAllergySymtom      string
+	// Symtom                 string
 
 	PatientRegisterID *uint
 	PatientRegister   PatientRegister `gorm:"references:ID"`
@@ -26,8 +25,12 @@ type HistorySheet struct {
 	NurseID *uint
 	Nurse   Employee `gorm:"references:ID"`
 
-	DrugAllergyID *uint
-	DrugAllergy   DrugAllergy `gorm:"references:ID"`
+	// DiagnosisRecord	[]DiagnosisRecord `gorm:"foriegnKey:HistorySheetID"`
+
+	// DrugAllergyID *uint
+	// DrugAllergy   DrugAllergy `gorm:"references:ID"`
+
+	DiagnosisRecords []DiagnosisRecord `gorm:"foreignKey:DiseaseID"`
 }
 
 type Nurse struct {
@@ -39,6 +42,7 @@ type Nurse struct {
 	Mobile               string
 	Address              string
 	Salary               uint16
+
 	HistorySheets        []HistorySheet `gorm:"foreignKey:NurseID"`
 }
 

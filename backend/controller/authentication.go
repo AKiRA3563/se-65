@@ -38,7 +38,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	// ค้นหา user ด้วย email ที่ผู้ใช้กรอกเข้ามา
-	if err := entity.DB().Raw("SELECT * FROM users WHERE email = ?", payload.Email).Scan(&user).Error; err != nil {
+	if err := entity.DB().Raw("SELECT * FROM employees WHERE email = ?", payload.Email).Scan(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

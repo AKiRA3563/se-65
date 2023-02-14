@@ -1,299 +1,205 @@
 import React, { useEffect, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
-import { FormControl, MenuItem, Snackbar } from "@mui/material";
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Paper from "@mui/material/Paper";
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
-//import '../App.css';
-import { DiagnosisRecordInterface } from "./models/IDiagnosisRecord";
-import { PartientRegisterInterface } from "./models/IPatientRegister";
-import { EmployeeInterface } from "./models/IEmployee"; 
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import MuiDrawer from "@mui/material/Drawer";
+import Box from "@mui/material/Box";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Container from "@mui/material/Container";
+import MenuIcon from "@mui/icons-material/Menu";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Button from "@mui/material/Button";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import HomeIcon from "@mui/icons-material/Home";
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
-import {
-  GetEmployee,
-  GetEquipment,
-  GetUser,
-  BorrowLists,
-  GetEmployeeLogIn,
-} from "../services/HttpClientService";
+import './App.css';
+import Home from "./components/Home"
+import DiagnosisRecordCreate from "./components/DiagnosisRecordCreate";
+import SignIn from "./components/SignIn";
+import TreatmentRecordCreate from "./components/TreatmentRecordCreate";
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  props,
-  ref
-) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+const drawerWidth = 240;
 
-function BorrowListCreate() {
-  const [employee, setEmployee] = useState<EmployeeInterface[]>([]);
-  const [employeeLogIn, setEmployeeLogIn] = useState<EmployeeInterface>();
-  const [user, setUser] = useState<UsersInterface[]>([]);
-  const [equipment, setEquipment] = useState<EquipmentInterface[]>([]);
-  const [borrowList, setBorrowList] = useState<Partial<BorrowListInterface>>({
-    Amount: 0,
-    BorrowTime: new Date(),
-    EmployeeID: employeeLogIn?.ID,
-  });
+interface AppBarProps extends MuiAppBarProps {
+  open?: boolean;
+}
 
-  const [success, setSuccess] = React.useState(false);
-  const [error, setError] = React.useState(false);
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
 
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSuccess(false);
-    setError(false);
-  };
- 
-  const handleChange = (event: SelectChangeEvent) => {
-    const name = event.target.name as keyof typeof borrowList;
-    setBorrowList({
-      ...borrowList,
-      [name]: event.target.value,
-    });
-  };
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  "& .MuiDrawer-paper": {
+    position: "relative",
+    whiteSpace: "nowrap",
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    boxSizing: "border-box",
+    ...(!open && {
+      overflowX: "hidden",
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      width: theme.spacing(7),
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9),
+      },
+    }),
+  },
+}));
 
-  const handleInputChange = (
-    event: React.ChangeEvent<{ id?: string; value: any }>
-  ) => {
-    const id = event.target.id as keyof typeof BorrowListCreate;
-    const { value } = event.target;
-    setBorrowList({ ...borrowList, [id]: value });
-  };
+const mdTheme = createTheme();
 
-  const getEmployee = async () => {
-    let res = await GetEmployee();
-    if (res) {
-      setEmployee(res);
-    }
-  };
+const menu = [
+  { name: "หน้าแรก", icon: <HomeIcon />, path: "/" },
+  { name: "บันทึกผลการวินิจฉัย", icon: <ListAltIcon />, path: "/create_diagnosis_records" },
+  { name: "จัดเก็บข้อมูลกการรักษา", icon: <ListAltIcon />, path: "/create_treatment_records" },
+];
 
-  const getEmployeeLogIn = async () => {
-    let res = await GetEmployeeLogIn();
-    if (res) {
-      setEmployeeLogIn(res);
-    }
-  };
-
-  const getEquipment = async () => {
-    let res = await GetEquipment();
-    if (res) {
-      setEquipment(res);
-    }
-  };
-
-  const getUser = async () => {
-    let res = await GetUser();
-    if (res) {
-      setUser(res);
-    }
+function App() {
+  const [token, setToken] = useState<String>("");
+  const [open, setOpen] = React.useState(false);
+  const toggleDrawer = () => {
+    setOpen(!open);
   };
 
   useEffect(() => {
-    getEmployeeLogIn();
-    getUser();
-    getEmployee();
-    getEquipment();
-    setBorrowList({
-      ...borrowList,
-      ["EmployeeID"]: employeeLogIn?.ID,
-    });
-  }, [employeeLogIn]);
-
-  const convertType = (data: string | number | undefined) => {
-    let val = typeof data === "string" ? parseInt(data) : data;
-    return val;
-  };
-
-  async function submit() {
-    let data = {
-      EmployeeID: convertType(borrowList?.EmployeeID),
-      MemberID: convertType(borrowList?.MemberID),
-      EquipmentID: convertType(borrowList?.EquipmentID),
-      Amount: convertType(borrowList?.Amount),
-      BorrowTime: borrowList?.BorrowTime,
-    };
-
-    let res = await BorrowLists(data);
-    if (res) {
-      setSuccess(true);
-      window.location.href="/borrow_list";
-    } else {
-      setError(true);
+    const token = localStorage.getItem("token");
+    if (token) {
+      setToken(token);
     }
+  }, []);
+
+  if (!token) {
+    return <SignIn />;
+  }
+
+  const signout = () => {
+    localStorage.clear();
+    window.location.href = "/";
   };
 
   return (
-    <Container maxWidth="md">
-      <Snackbar
-        open={success}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleClose} severity="success">
-          บันทึกข้อมูลสำเร็จ
-        </Alert>
-      </Snackbar>
-
-      <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="error">
-          เกิดความผิดพลาด
-        </Alert>
-      </Snackbar>
-
-      <Container maxWidth="md">
-        <Paper>
+    <Router>
+      <ThemeProvider theme={mdTheme}>
+        <Box sx={{ display: "flex" }}>
+          <CssBaseline />
+          <AppBar position="absolute" open={open}>
+            <Toolbar
+              sx={{
+                pr: "24px", // keep right padding when drawer closed
+              }}
+            >
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="open drawer"
+                onClick={toggleDrawer}
+                sx={{
+                  marginRight: "36px",
+                  ...(open && { display: "none" }),
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography
+                component="h1"
+                variant="h6"
+                color="inherit"
+                noWrap
+                sx={{ flexGrow: 1 }}
+              >
+                ระบบจัดการคนไข้นอก
+              </Typography>
+              <Button color="inherit" onClick={signout}>
+                Sign Out
+              </Button>
+            </Toolbar>
+          </AppBar>
+          <Drawer variant="permanent" open={open}>
+            <Toolbar
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                px: [1],
+              }}
+            >
+              <IconButton onClick={toggleDrawer}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </Toolbar>
+            <Divider />
+            <List>
+              {menu.map((item, index) => (
+                <Link
+                  to={item.path}
+                  key={item.name}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <ListItem button>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.name} />
+                  </ListItem>
+                </Link>
+              ))}
+            </List>
+          </Drawer>
           <Box
-            display={"flex"}
+            component="main"
             sx={{
-              marginTop: 2,
-              paddingX: 2,
-              paddingY: 2,
+              backgroundColor: (theme) =>
+                theme.palette.mode === "light"
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
+              flexGrow: 1,
+              height: "100vh",
+              overflow: "auto",
             }}
           >
-            <Typography
-              component="h2"
-              variant="h6"
-              color="primary"
-              gutterBottom
-            >
-              บันทึกรายการยืมอุปกรณ์ 
-            </Typography>
+          <Toolbar />
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<SignIn />} />
+                {/* <Route path="/borrow_list" element={<BorrowList />} /> */}
+                <Route path="/create_diagnosis_records" element={<DiagnosisRecordCreate />} />
+                <Route path="/create_treatment_records" element={<TreatmentRecordCreate />} />
+              </Routes>
+            </Container>
           </Box>
-          <hr/>
-          <Grid container spacing={2} columns={8} className="centered-div">
-        
-            <Grid item xs={3}>
-              <FormControl fullWidth>
-                <p>Employee</p>
-                <Select
-                  fullWidth
-                  disabled
-                  value={localStorage.getItem('uid')}
-                  name="EmployeeID"
-                  variant="outlined"
-                  sx={{bgcolor: "rgba(0, 0, 0, 0.1)"}}
-                >
-                {employee.map((item: EmployeeInterface) => (
-                  <option value={item.ID} key={item.ID}>
-                    {item.FirstName}
-                  </option>
-                ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={3}>
-              <FormControl fullWidth variant="outlined">
-                <p>User</p>
-                <Select
-                  native
-                  fullWidth 
-                  value={borrowList.MemberID + ""}
-                  onChange={handleChange}
-                  inputProps={{name: "MemberID",}}
-                >
-                  <option aria-label="None" value="" >
-                    Select User
-                  </option>
-                  {user.map((item: UsersInterface) => (
-                    <option value={item.ID} key={item.ID}>
-                      {item.FirstName}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-        
-            <Grid item xs={6}>
-              <FormControl fullWidth variant="outlined">
-                <p>Equipment</p>
-                <Select
-                  native
-                  value={borrowList.EquipmentID + ""}
-                  onChange={handleChange}
-                  inputProps={{name: "EquipmentID",}}
-                >
-                  <option aria-label="None" value="" >
-                    Select Equipment
-                  </option>
-                  {equipment.map((item: EquipmentInterface) => (
-                    <option value={item.ID} key={item.ID}>
-                      {item.Name}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-        
-            <Grid item xs={3}>
-              <p>Amount</p>
-              <TextField 
-                fullWidth 
-                id="Amount"
-                InputProps={{inputProps: {min: 1, max: 100}}}
-                type="number"
-                variant="outlined"
-                defaultValue={0}
-                onChange={handleInputChange}
-              />
-            </Grid>
-        
-            <Grid item xs={3}>
-              <FormControl fullWidth>
-                <p>Date & Time</p>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    value={borrowList?.BorrowTime}
-                      onChange={(newValue) => {
-                        setBorrowList({
-                          ...borrowList,
-                          BorrowTime: newValue,
-                        });
-                      }}
-                    renderInput={(props) => <TextField {...props} />}
-                    ampm = {false}
-                  />
-                </LocalizationProvider>
-              </FormControl>
-            </Grid>
-        
-            <Grid item xs={6}>
-              <Button
-                component={RouterLink}
-                to="/borrow_list"
-                variant="contained"
-                sx ={{p: 1, m: 2, mx: 'auto'}}
-                color="inherit">
-                  Back
-              </Button>
-              <Button 
-                variant="contained" 
-                color='success' 
-                sx ={{p: 1, m: 2, mx: 'auto', float: "right"}}
-                onClick={submit}>
-                  Submit
-              </Button>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Container>
-    </Container>
+        </Box>
+      </ThemeProvider>
+    </Router>
   );
 }
 

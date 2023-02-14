@@ -1,7 +1,12 @@
-export interface PartientRegisterInterface {
+import { GenderInterface } from "./IEmployee";
+
+export interface PatientRegisterInterface {
     ID:         number;
-    FirstName: string;
-    LastName:  string;
+    FirstName:  string;
+    LastName:   string;
+    Gender:     GenderInterface;
+    Age:        number;
+    Mobile:     string;
     Email:      string;
-    Password:   string;
+
 }
