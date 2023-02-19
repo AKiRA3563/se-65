@@ -16,8 +16,7 @@ func CreateDiagnosisRecord(c *gin.Context) {
 	var historysheet entity.HistorySheet
 	var disease entity.Disease
 	var diagnosisrecord entity.DiagnosisRecord
-	// var medicalcertificate entity.MedicalCertificate
-
+	
 	if err := c.ShouldBindJSON(&diagnosisrecord); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -46,12 +45,6 @@ func CreateDiagnosisRecord(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "disease not found"})
 		return
 	}
-
-	// //ค้นหา Medicalcertificate ด้วย id
-	// if tx := entity.DB().Table("medical_certificates").Where("id = ?", diagnosisrecord.MedicalCertificateID).First(&medicalcertificate); tx.RowsAffected == 0 {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "medical certificate not found"})
-	// 	return
-	// }
 
 	//สร้าง DiagnosisRecord
 	dr := entity.DiagnosisRecord{
@@ -95,7 +88,6 @@ func GetDiagnosisRecord(c *gin.Context) {
 		Preload("HistorySheet").	
 		Preload("HistorySheet.PatientRegister").
 		Preload("Disease").
-		// Preload("MedicalCertificate").
 		Find(&diagnosisrecord).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -112,7 +104,6 @@ func ListDiagnosisRecords(c *gin.Context) {
 		Preload("HistorySheet").		
 		Preload("HistorySheet.PatientRegister").
 		Preload("Disease").
-		// Preload("MedicalCertificate").
 		Find(&diagnosisrecords).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -16,6 +16,7 @@ func CreateMedicine(c *gin.Context) {
 		return
 	}
 
+	//บันทึก
 	if err := entity.DB().Create(&medicine).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

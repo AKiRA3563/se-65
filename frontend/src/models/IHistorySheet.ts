@@ -1,17 +1,28 @@
-import { EmployeeInterface } from "./IEmployee";
-import { PatientRegisterInterface } from "./IPatientRegister";
+import { EmployeesInterface } from "./IEmployee";
+import { PatientRegistersInterface } from "./IPatientRegister";
 
-export interface HistorySheetInterface {
-    ID: number;
-    Weight: Float32Array;
-    Height: Float32Array;
-    BMI:    Float32Array;
-    Temperature:    Float32Array;
-    HeartRate:      number;
-    OxygenSaturation:   number;
-    
-    PatientRegisterID:  number
-    PatientRegister:    PatientRegisterInterface;
-    
-    Nurse:      EmployeeInterface;
+export interface HistorySheetsInterface {
+    ID: string;
+    Weight: number;
+    Height: number;
+    BMI: number;
+    Temperature: number;
+    SystolicBloodPressure: number;
+    DiastolicBloodPressure: number;
+    HeartRate: number;
+    RespiratoryRate: number;
+    OxygenSaturation: number;
+    DrugAllergySymtom: string;
+    PatientSymtom: string;
+    PatientRegisterID: number;
+    PatientRegister: PatientRegistersInterface;
+    NurseID: number;
+    Nurse: EmployeesInterface;
+    DrugAllergyID: number;
+    DrugAllergy: DrugAllergysInterface;
+}
+
+export interface DrugAllergysInterface{
+    ID: string;
+    Name: string;
 }

@@ -1,6 +1,6 @@
-import { DiagnosisRecordInterface } from "./IDiagnosisRecord";
-import { EmployeeInterface } from "./IEmployee";
-import { PatientRegisterInterface } from "./IPatientRegister";
+import { DiagnosisRecordsInterface } from "./IDiagnosisRecord";
+import { EmployeesInterface } from "./IEmployee";
+// import { PatientRegistersInterface } from "./IPatientRegister";
 
 export interface TreatmentRecordInterface {
     ID?: number;
@@ -9,10 +9,10 @@ export interface TreatmentRecordInterface {
     // PatientRegister?:   PatientRegisterInterface;
 
 	DoctorID?: number;
-	Doctor?: EmployeeInterface;
+	Doctor?: EmployeesInterface;
 
     DiagnosisRecordID?: number;
-    DiagnosisRecord?:   DiagnosisRecordInterface;
+    DiagnosisRecord?:   DiagnosisRecordsInterface;
 
     MedicineID?: number;
     Medicine?:   MedicineInterface;

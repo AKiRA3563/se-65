@@ -13,7 +13,7 @@ type Medicine struct {
 
 	Name        string
 	Description string
-	Price       int
+	Price       float32
 
 	TreatmentRecord []TreatmentRecord `gorm:"foreignKey:MedicineID"`
 }
@@ -42,7 +42,7 @@ type TreatmentRecord struct {
 	Medicine         Medicine `gorm:"references:id" valid:"-"`
 	MedicineQuantity int      `valid:"int, range(0|100)~MedicineQuantity must not be negative"`
 
-	Date time.Time `valid:"present~Date must not be past"`
+	Date time.Time `valid:"present~Date must be present"`
 }
 
 func init() {
@@ -50,7 +50,7 @@ func init() {
 	govalidator.CustomTypeTagMap.Set("present", func(i interface{}, context interface{}) bool {
 		t := i.(time.Time)
 		// ปัจจุบัน บวกลบไม่เกิน 3 นาที		
-		if t.Before(time.Now().Add(-3*time.Minute)) || t.After(time.Now().Add(3*time.Minute)) {
+		if t.Before(time.Now().Add(time.Hour*-12)) || t.After(time.Now().Add(time.Hour*12)) {
 			return false
 		} else {
 			return true

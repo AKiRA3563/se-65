@@ -1,5 +1,5 @@
 import React from "react";
-import { DiagnosisRecordInterface } from "../models/IDiagnosisRecord";
+import { DiagnosisRecordsInterface } from "../models/IDiagnosisRecord";
 import { SigninInterface } from "../models/ISignIn";
 import { TreatmentRecordInterface } from "../models/ITreatmentRecord";
 
@@ -195,7 +195,7 @@ async function GetHistorysheet() {
 //================================================================================================
 
 //Create Diagnosis
-async function CreateDiagnosisRecord(data: DiagnosisRecordInterface) {
+async function CreateDiagnosisRecord(data: DiagnosisRecordsInterface) {
   const requestOption = {
     method: "POST",
     headers: {

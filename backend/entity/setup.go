@@ -32,8 +32,6 @@ func SetupDatabase() {
 		&TreatmentRecord{},
 		&Medicine{},
 
-		// &MedicalCertificate{},
-
 		&Employee{},
 		&Gender{},
 		&Role{},
@@ -112,26 +110,70 @@ func SetupDatabase() {
 	db.Model(&Disease{}).Create(&disease14)
 
 	//=================Medicine Data====================
-	medicine1 := Medicine{
-		Name:        "ไม่มี",
+	// medicine1 := Medicine{
+	// 	Name:        "ไม่มี",
+	// 	Description: "none",
+	// 	Price:       0,
+	// }
+	// db.Model(&Medicine{}).Create(&medicine1)
+
+	// db.Model(&Medicine{}).Create(&Medicine{
+	// 	Name:     "ยาแก้ไข้",
+	// 	Description: "บรรเทาอาการปวดลดไข้",
+	// 	Price:       120.00,
+	// }
+	db.Model(&Medicine{}).Create(&Medicine{
+		Name:     "ไม่มี",
 		Description: "none",
 		Price:       0,
+	})
+
+	medicine1 := Medicine{
+		Name:     "ยาแก้ไข้",
+		Description: "บรรเทาอาการปวดลดไข้",
+		Price:       120.00,
 	}
 	db.Model(&Medicine{}).Create(&medicine1)
 
-	medicine2 := Medicine{
-		Name:        "Paracetamol",
-		Description: "ใช้บรรเทาปวด ลดไข้",
-		Price:       15,
-	}
-	db.Model(&Medicine{}).Create(&medicine2)
+	db.Model(&Medicine{}).Create(&Medicine{
+		Name:     "Metformin",
+		Description: "ยารักษาโรคเบาหวาน",
+		Price:       300.00,
+	})
 
-	medicine3 := Medicine{
-		Name:        "Antacil Gel",
-		Description: "บรรเทาอาการปวดท้อง ท้องอืด จุกเสียด แน่น",
-		Price:       42,
+	db.Model(&Medicine{}).Create(&Medicine{
+		Name:     "Clarityne",
+		Description: "ยาบรรเทาอาการแพ้ระบบทางเดินหายใจ",
+		Price:       200.00,
+	})
+
+	db.Model(&Medicine{}).Create(&Medicine{
+		Name:     "Antacil Gel",
+		Description: "ยาบรรเทาอาการ แสบร้อนกลางอกเนื่องจากกรดไหลย้อน ลดกรด ลดแก๊ส เคลือบแผลในกระเพาะอาหาร ปวดท้อง ท้องอืด จุกเสียด แน่น อาหารไม่ย่อย",
+		Price:       65.00,
+	})
+
+	db.Model(&Medicine{}).Create(&Medicine{
+		Name:     "Omepazole",
+		Description: "เป็นยารักษาโรคกรดไหลย้อน โรคแผลเปื่อยเพปติก/แผลในกระเพาะอาหาร ",
+		Price:       275.50,
+	})
+	db.Model(&Medicine{}).Create(&Medicine{
+		Name:     "Ibupofen",
+		Description: "บรรเทาอาการปวดประจำเดือน",
+		Price:       125.45,
+	})
+
+	// DrugAllergy -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	drugallergy1 := DrugAllergy{
+		Name: "แพ้ยา/Drug Allergy",
 	}
-	db.Model(&Medicine{}).Create(&medicine3)
+	db.Model(&DrugAllergy{}).Create(&drugallergy1)
+
+	drugallergy2 := DrugAllergy{
+		Name: "ไม่แพ้ยา/Not Allergic",
+	}
+	db.Model(&DrugAllergy{}).Create(&drugallergy2)
 
 	//=================Employee========================
 	password, err := bcrypt.GenerateFromPassword([]byte("qwerty"), 14)
@@ -226,17 +268,6 @@ func SetupDatabase() {
 	}
 	db.Model(&HistorySheet{}).Create(&historysheet2)
 
-	//==============Medicalcertificate=================
-	// med1 := MedicalCertificate{
-	// 	Label: "รับ",
-	// }
-	// db.Model(&MedicalCertificate{}).Create(&med1)
-
-	// med2 := MedicalCertificate{
-	// 	Label: "ไม่รับ",
-	// }
-	// db.Model(&MedicalCertificate{}).Create(&med2)
-
 	//==============Diagnosis Record====================
 	t := true
 	// f := false
@@ -258,7 +289,7 @@ func SetupDatabase() {
 		Treatment:        "ให้ทานยา และพักผ่อน",
 		Note:             "รอดูอาการในการตรวจครั้งหน้า",
 		Appointment:      &t,
-		Medicine:         medicine2,
+		Medicine:         medicine1,
 		MedicineQuantity: 24,
 		 Date:             time.Now(),
 	}

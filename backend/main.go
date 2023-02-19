@@ -48,11 +48,6 @@ func main() {
 			r.PATCH("/medicines", controller.UpdateMedicine)
 			r.DELETE("/medicines/:id", controller.DeleteMedicine)
 
-			// r.POST("/medicalcertificates", controller.CreateMedicalCertificate)
-			// r.GET("/medicalcertificates", controller.ListMedicalCertificates)
-			// r.GET("/medicalcertificate/:id", controller.GetMedicalCertificate)
-
-
 			r.GET("/employees", controller.ListEmployees)
 			r.GET("/employee/:id", controller.GetEmployee)
 

@@ -10,29 +10,27 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Paper from "@mui/material/Paper";
-import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
 import '../App.css';
-import { EmployeeInterface, GenderInterface } from "../models/IEmployee";
-import { PatientRegisterInterface } from "../models/IPatientRegister";
-import { DiagnosisRecordInterface, DiseaseInterface, MedicalCertificateInterface } from "../models/IDiagnosisRecord";
-import { HistorySheetInterface } from "../models/IHistorySheet";
+import { EmployeesInterface, GendersInterface } from "../models/IEmployee";
+import { PatientRegistersInterface } from "../models/IPatientRegister";
+import { DiagnosisRecordsInterface, DiseasesInterface } from "../models/IDiagnosisRecord";
+import { HistorySheetsInterface } from "../models/IHistorySheet";
 
 import {
   GetEmployee,
-  GetEmployeeByUID,
   GetPatient,
   GetHistorysheet,
   GetDisease,
   CreateDiagnosisRecord,
-  // GetMedicalCertificate,
 } from "../services/HttpClientService";
+import { DatePicker } from "@mui/x-date-pickers";
+import TreatmentRecord from "./TreatmentRecord";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -42,13 +40,11 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 function DiagnosisRecordCreate() {
-  const [employee, setEmployee] = useState<EmployeeInterface[]>([]);
-  // const [employeeUID, setEmployeeUID] = useState<EmployeeInterface>();
-  const [patient, setPatient] = useState<PatientRegisterInterface[]>([]);
-  const [disease, setDisease] = useState<DiseaseInterface[]>([]);
-  const [historySheet, setHistorySheet] = useState<HistorySheetInterface[]>([]);
-  // const [medicalCertificate, setMedicalCertificate] = useState<MedicalCertificateInterface[]>([]);
-  const [diagnosisRecord, setDiagnosisRecord] = useState<Partial<DiagnosisRecordInterface>>({
+  const [employee, setEmployee] = useState<EmployeesInterface[]>([]);
+  const [patient, setPatient] = useState<PatientRegistersInterface[]>([]);
+  const [disease, setDisease] = useState<DiseasesInterface[]>([]);
+  const [historySheet, setHistorySheet] = useState<HistorySheetsInterface[]>([]);
+  const [diagnosisRecords, setDiagnosisRecord] = useState<Partial<DiagnosisRecordsInterface>>({
     Examination: "",
     MedicalCertificate: undefined,
     Date: new Date(),
@@ -77,11 +73,11 @@ function DiagnosisRecordCreate() {
   };
 
   const handleChange = (event: SelectChangeEvent) => {
-    const name = event.target.name as keyof typeof diagnosisRecord;
+    const name = event.target.name as keyof typeof diagnosisRecords;
     console.log("handleChage")
     console.log(event.target.value)
     setDiagnosisRecord({
-      ...diagnosisRecord,
+      ...diagnosisRecords,
       [name]: event.target.value,
     });
   };
@@ -89,20 +85,20 @@ function DiagnosisRecordCreate() {
   const handleInputChange = (
     event: React.ChangeEvent<{ id?: string; value: any }>
   ) => {
-    const id = event.target.id as keyof typeof diagnosisRecord;
+    const id = event.target.id as keyof typeof diagnosisRecords;
     const { value } = event.target;
-    setDiagnosisRecord({ ...diagnosisRecord, [id]: value });
+    setDiagnosisRecord({ ...diagnosisRecords, [id]: value });
   };
 
   const handleSeclectChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const name = event.target.name as keyof typeof diagnosisRecord;
+    const name = event.target.name as keyof typeof diagnosisRecords;
     const { value } = event.target;
     console.log(name)
     console.log(event.target.value)
     setDiagnosisRecord({
-      ...diagnosisRecord,
+      ...diagnosisRecords,
       [name]: value === "true" ? true : false
     })
   }
@@ -113,13 +109,6 @@ function DiagnosisRecordCreate() {
       setEmployee(res);
     }
   };
-
-  // const getEmployeeUID = async () => {
-  //   let res = await GetEmployeeByUID();
-  //   if (res) {
-  //     setEmployeeUID(res);
-  //   }
-  // };
 
   const getPatient = async () => {
     let res = await GetPatient();
@@ -143,20 +132,11 @@ function DiagnosisRecordCreate() {
     }
   };
 
-  // const getMedicalCertificate = async () => {
-  //   let res = await GetMedicalCertificate();
-  //   if (res) {
-  //     setMedicalCertificate(res);
-  //   }
-  // };
-
   useEffect(() => {
-    // getEmployeeUID();
     getEmployee();
     getPatient();
     getHistorySheet();
     getDisease();
-    // getMedicalCertificate();
   }, []);
 
   const convertType = (data: string | number | undefined) => {
@@ -165,28 +145,44 @@ function DiagnosisRecordCreate() {
   };
 
   async function submit() {
-    let data = {
-      // PatientRegisterID: diagnosisRecord.HistorySheet?.PatientRegisterID,
-      DoctorID: convertType(diagnosisRecord.DoctorID),
-      HistorySheetID: convertType(diagnosisRecord.HistorySheetID),
-      DiseaseID: convertType(diagnosisRecord.DiseaseID),
-      // MedicalCertificateID: convertType(diagnosisRecord.MedicalCertificateID),
-      MedicalCertificate: diagnosisRecord.MedicalCertificate,
-      Examination: diagnosisRecord.Examination,
-      Date: diagnosisRecord.Date,
-    };
-
-    //console.log(data);
-    let res = await CreateDiagnosisRecord(data);
-    if (res.status) {
-      setSuccess(true);
-      setMessages("Successfully!!");
+    if (diagnosisRecords.HistorySheetID == null) {
+      setError(true)
+      setMessages("กรุณาเลือกชื่อผู้ป่วย")
+    } else if (diagnosisRecords.DiseaseID == null) {
+      setError(true)
+      setMessages("กรุณาเลือกชื่อโรค")
     } else {
-      setError(true);
-      setMessages("Fail!! " + res.message);
-    }
-  };
+      setError(false)
+      let data = {
+        // PatientRegisterID: diagnosisRecord.HistorySheet?.PatientRegisterID,
+        DoctorID: convertType(diagnosisRecords.DoctorID),
+        HistorySheetID: convertType(diagnosisRecords.HistorySheetID),
+        DiseaseID: convertType(diagnosisRecords.DiseaseID),
+        MedicalCertificate: diagnosisRecords.MedicalCertificate,
+        Examination: diagnosisRecords.Examination,
+        Date: diagnosisRecords.Date,
+      };
 
+      //console.log(data);
+      let res = await CreateDiagnosisRecord(data);
+      if (res.status) {
+        setSuccess(true);
+        setMessages("Successfully!!");
+      } else {
+        setError(true);
+        if (res.message == "Examination cannot be Blank") {
+          setMessages("กรุณากรอกผลการตรวจร่างกาย");
+        } else if (res.message == "Recording time must be current") {
+          setMessages("วันที่ต้องเป็นปัจจุบัน");
+        } else if (res.message == "MedicalCertificate cannot be Null") {
+          setMessages("กรุณาเลือกข้อมูล");
+        } else  { 
+          setMessages(res.message);
+        }
+      }
+    };
+  }
+  
   return (
     <Container maxWidth="md">
       <Snackbar
@@ -229,7 +225,7 @@ function DiagnosisRecordCreate() {
                 id="select-patient"
                 label="ชื่อ"
                 inputProps={{ name: "HistorySheetID", native: true, autoFocus: true  }}
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 onChange={handleChange}
                 native
                 autoFocus
@@ -237,7 +233,7 @@ function DiagnosisRecordCreate() {
                 <option key={0} value={0}>
                   เลือกข้อมูล
                 </option>
-                {patient.map((item: PatientRegisterInterface) => (
+                {patient.map((item: PatientRegistersInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.FirstName} {item.LastName}
                   </option>
@@ -248,7 +244,7 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-patient">อายุ</InputLabel>
               <Select
                 id="select-patient"
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 label="อายุ"
                 // onChange={handleChange}
                 inputProps={{ readOnly: true, native: true, autoFocus: true }}
@@ -257,7 +253,7 @@ function DiagnosisRecordCreate() {
                   <em>None</em>
                 </MenuItem>
                 <option key={0} value={0}></option>
-                {patient.map((item: PatientRegisterInterface) => (
+                {patient.map((item: PatientRegistersInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Age}
                   </option>
@@ -268,13 +264,13 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-patient">เพศ</InputLabel>
               <Select
                 id="select-patient"
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 label="เพศ"
                 onChange={handleChange}
                 inputProps={{ readOnly: true, native: true, autoFocus: true }}
               >
                 <option key={0} value={0}></option>
-                {patient.map((item: PatientRegisterInterface) => (
+                {patient.map((item: PatientRegistersInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Gender.Name}
                   </option>
@@ -292,7 +288,7 @@ function DiagnosisRecordCreate() {
                 id="Examination"
                 label="การตรวจร่างกาย"
                 variant="outlined"
-                value={diagnosisRecord.Examination ?? ""}
+                value={diagnosisRecords.Examination ?? ""}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -300,7 +296,7 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-disease-label">วินิฉัยโรค</InputLabel>
               <Select
                 id="select-disease-label"
-                value={diagnosisRecord.DiseaseID + ""}
+                value={diagnosisRecords.DiseaseID + ""}
                 label="วินิฉัยโรค"
                 onChange={handleChange}
                 inputProps={{ name: "DiseaseID" }}
@@ -310,36 +306,19 @@ function DiagnosisRecordCreate() {
                 <option key={0} value={0}>
                   <em>เลือกผลวินิฉัยโรค</em>
                 </option>
-                {disease.map((item: DiseaseInterface) => (
+                {disease.map((item: DiseasesInterface) => (
                   <option value={item.ID} key={item.ID}>
                   {item.Name}
                 </option>
                 ))}
               </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 200 }}>        
-            {/* <InputLabel id="select-medicalcertificate-label">รับใบรับรองแพทย์</InputLabel>      
-              <Select
-                id="select-medicalcertificate-label"
-                label="รับใบรับรองแพทย์"
-                value={diagnosisRecord.MedicalCertificateID + ""}
-                inputProps={{ name: "MedicalCertificateID",}}
-                onChange={handleChange}
-              >
-                <MenuItem aria-label="None" value="">
-                  <em>เลือก</em>
-                </MenuItem>
-                {medicalCertificate.map((item: MedicalCertificateInterface) => (
-                  <MenuItem key={item.ID} value={item.ID}>
-                    {item.Label}
-                  </MenuItem>
-                ))}
-              </Select> */}
+            <FormControl sx={{ m: 1, maxWidth: 150 }}>        
               <TextField
                 select
                 id="select-medicalcertificate-label"
                 label="รับใบรับรองแพทย์"
-                value={diagnosisRecord.MedicalCertificate + ""}
+                value={diagnosisRecords.MedicalCertificate + ""}
                 inputProps={{ name: "MedicalCertificate", }}
                 SelectProps={{ 
                   native: true, 
@@ -365,13 +344,13 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-sheet-label">น้ำหนัก</InputLabel>
               <Select
                 id="select-sheet-label"
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 label="น้ำหนัก"
                 // onChange={handleChange}
                 inputProps={{ readOnly: true, native: true, autoFocus: true }} 
               >
                 <option key={0} value={0}></option>
-                {historySheet.map((item: HistorySheetInterface) => (
+                {historySheet.map((item: HistorySheetsInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Weight} กก.
                   </option>
@@ -382,13 +361,13 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-sheet-label">ส่วนสูง</InputLabel>
               <Select
                 id="select-sheet-label"
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 label="ส่วนสูง"
                 // onChange={handleChange}
                 inputProps={{ readOnly: true, native: true, autoFocus: true }} 
               >
                 <option key={0} value={0}></option>
-                {historySheet.map((item: HistorySheetInterface) => (
+                {historySheet.map((item: HistorySheetsInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Height} ซม.
                   </option>
@@ -399,13 +378,13 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-sheet-label">อุณหภูมิ</InputLabel>
               <Select
                 id="select-sheet-label"
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 label="อุณหภูมิ"
                 // onChange={handleChange}
                 inputProps={{ readOnly: true, native: true, autoFocus: true }} 
               >
                 <option key={0} value={0}></option>
-                {historySheet.map((item: HistorySheetInterface) => (
+                {historySheet.map((item: HistorySheetsInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Temperature} °C
                   </option>
@@ -416,13 +395,13 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-sheet-label">ชีพจร</InputLabel>
               <Select
                 id="select-sheet-label"
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 label="ชีพจร"
                 // onChange={handleChange}
                 inputProps={{ readOnly: true, native: true, autoFocus: true }} 
               >
                 <option key={0} value={0}></option>
-                {historySheet.map((item: HistorySheetInterface) => (
+                {historySheet.map((item: HistorySheetsInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.HeartRate} ครั้ง/นาที
                   </option>
@@ -433,13 +412,13 @@ function DiagnosisRecordCreate() {
               <InputLabel id="select-sheet-label">ค่าออกซิเจน</InputLabel>
               <Select
                 id="select-sheetlabel"
-                value={diagnosisRecord.HistorySheetID + ""}
+                value={diagnosisRecords.HistorySheetID + ""}
                 label="ค่าออกซิเจน"
                 // onChange={handleChange}
                 inputProps={{ readOnly: true, native: true, autoFocus: true }} 
               >
                 <option key={0} value={0}></option>
-                {historySheet.map((item: HistorySheetInterface) => (
+                {historySheet.map((item: HistorySheetsInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.OxygenSaturation} %
                   </option>
@@ -460,7 +439,7 @@ function DiagnosisRecordCreate() {
                 //onChange={handleChange}
                 inputProps={{ readOnly: true }}
               >
-                {employee.map((item: EmployeeInterface) => (
+                {employee.map((item: EmployeesInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.FirstName}
                   </option>
@@ -469,17 +448,16 @@ function DiagnosisRecordCreate() {
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DateTimePicker
+                <DatePicker
                   label="วันที่ตรวจ"
-                  value={diagnosisRecord?.Date || new Date()}
+                  value={diagnosisRecords?.Date || new Date()}
                   onChange={(newValue) => {
                     setDiagnosisRecord({
-                      ...diagnosisRecord,
+                      ...diagnosisRecords,
                       Date: newValue,
                     });
                   }}
                   renderInput={(params) => <TextField {...params} />}
-                  ampm={false}
                 />
               </LocalizationProvider>
             </FormControl>

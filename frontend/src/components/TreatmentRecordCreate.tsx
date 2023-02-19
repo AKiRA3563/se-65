@@ -20,20 +20,19 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
 import '../App.css';
-import { EmployeeInterface, GenderInterface } from "../models/IEmployee";
-import { PatientRegisterInterface } from "../models/IPatientRegister";
-import { DiagnosisRecordInterface, DiseaseInterface } from "../models/IDiagnosisRecord";
+import { EmployeesInterface, GendersInterface } from "../models/IEmployee";
+import { PatientRegistersInterface } from "../models/IPatientRegister";
+import { DiagnosisRecordsInterface, DiseasesInterface } from "../models/IDiagnosisRecord";
 import { MedicineInterface, TreatmentRecordInterface } from "../models/ITreatmentRecord";
 
 import {
   GetEmployee,
-  GetEmployeeByUID,
   GetPatient,
   GetDiagnosisRecord,
   GetMedicine,
   CreateTreatmentRecord,
 } from "../services/HttpClientService";
-import { DatePicker, DesktopDatePicker } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -43,11 +42,11 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 function TreatmentRecordCreate() {
-  const [employee, setEmployee] = useState<EmployeeInterface[]>([]);
+  const [employee, setEmployee] = useState<EmployeesInterface[]>([]);
   //   const [employeeUID, setEmployeeUID] = useState<EmployeeInterface>();
-  const [patient, setPatient] = useState<PatientRegisterInterface[]>([]);
+  const [patient, setPatient] = useState<PatientRegistersInterface[]>([]);
   const [medicine, setMedicine] = useState<MedicineInterface[]>([]);
-  const [diagnosisRecord, setDiagnosisRecord] = useState<DiagnosisRecordInterface[]>([]);
+  const [diagnosisRecord, setDiagnosisRecord] = useState<DiagnosisRecordsInterface[]>([]);
   const [treatmentRecord, setTreatmentRecord] = useState<Partial<TreatmentRecordInterface>>({
     Treatment: "",
     Note: "",
@@ -116,13 +115,6 @@ function TreatmentRecordCreate() {
     }
   };
 
-  //   const getEmployeeUID = async () => {
-  //     let res = await GetEmployeeByUID();
-  //     if (res) {
-  //       setEmployeeUID(res);
-  //     }
-  //   };
-
   const getPatient = async () => {
     let res = await GetPatient();
     if (res) {
@@ -145,7 +137,6 @@ function TreatmentRecordCreate() {
   };
 
   useEffect(() => {
-    // getEmployeeUID();
     getEmployee();
     getPatient();
     getMedicine();
@@ -233,7 +224,7 @@ function TreatmentRecordCreate() {
                 <option key={0} value={0}>
                   เลือกข้อมูล
                 </option>
-                {patient.map((item: PatientRegisterInterface) => (
+                {patient.map((item: PatientRegistersInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.FirstName} {item.LastName}
                   </option>
@@ -250,7 +241,7 @@ function TreatmentRecordCreate() {
                 inputProps={{ readOnly: true, native: true, autoFocus: true }}
               >
                 <option key={0} value={0}></option>
-                {patient.map((item: PatientRegisterInterface) => (
+                {patient.map((item: PatientRegistersInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Age}
                   </option>
@@ -267,7 +258,7 @@ function TreatmentRecordCreate() {
                 inputProps={{ readOnly: true, native: true, autoFocus: true }}
               >
                 <option key={0} value={0}></option>
-                {patient.map((item: PatientRegisterInterface) => (
+                {patient.map((item: PatientRegistersInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Gender.Name}
                   </option>
@@ -278,6 +269,26 @@ function TreatmentRecordCreate() {
 {/* ========================== Diagnosis ==================================== */}
           <Box sx={{ paddingX: 3, paddingY: 2 }}>
             <p>รายละเอียดการวินิจฉัย</p>
+            {/* <FormControl required sx={{ m: 1, minWidth: 100 }}>
+              <InputLabel id="No">ครั้งที่</InputLabel>
+              <Select
+                id="No"
+                label="ครั้งที่"
+                variant="outlined"
+                value={treatmentRecord.DiagnosisRecordID + ""}
+                inputProps={{ name: "DiagnosisID" }}
+                onChange={handleChange}
+                native
+                autoFocus
+              >
+                <option key={0} value={0}></option>
+                {diagnosisRecord.map((item: DiagnosisRecordInterface) => (
+                  <option value={item.ID} key={item.ID}>
+                    ครั้งที่ {item.ID}
+                  </option>
+                ))}
+              </Select>
+            </FormControl> */}
             <FormControl required sx={{ m: 1, minWidth: 300 }}>
               <InputLabel id="Examination">การตรวจร่างกาย</InputLabel>
               <Select
@@ -288,7 +299,7 @@ function TreatmentRecordCreate() {
                 inputProps={{ readOnly: true, native: true, autoFocus: true }}
               >
                 <option key={0} value={0}></option>
-                {diagnosisRecord.map((item: DiagnosisRecordInterface) => (
+                {diagnosisRecord.map((item: DiagnosisRecordsInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Examination}
                   </option>
@@ -305,7 +316,7 @@ function TreatmentRecordCreate() {
                 inputProps={{ readOnly: true, native: true, autoFocus: true }} 
               >
                 <option key={0} value={0}></option>
-                {diagnosisRecord.map((item: DiagnosisRecordInterface) => (
+                {diagnosisRecord.map((item: DiagnosisRecordsInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.Disease?.Name}
                   </option>
@@ -411,7 +422,7 @@ function TreatmentRecordCreate() {
                 native
                 autoFocus
               >
-                {employee.map((item: EmployeeInterface) => (
+                {employee.map((item: EmployeesInterface) => (
                   <option value={item.ID} key={item.ID}>
                     {item.FirstName}
                   </option>
@@ -420,7 +431,7 @@ function TreatmentRecordCreate() {
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DateTimePicker
+                <DatePicker
                   label="วันที่ตรวจ"
                   value={treatmentRecord.Date || new Date()}
                   onChange={(newValue) => {

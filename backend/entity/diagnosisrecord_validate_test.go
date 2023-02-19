@@ -8,6 +8,27 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func TestDiagnosisRecordPass(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	v := true
+	diagnosis := DiagnosisRecord{
+
+		Examination: "yes",
+		MedicalCertificate: &v,
+		Date: time.Now(),
+	}
+
+	// ตรวจสอบด้วย govalidator
+	ok, err := govalidator.ValidateStruct(diagnosis)
+
+	// ok ต้องเป็น true แปลว่าไม่มี error
+	g.Expect(ok).To(BeTrue())
+
+	// err เป็นค่า nil แปลว่าไม่มี error
+	g.Expect(err).To(BeNil())
+}
+
 // ตรวจสอบค่าว่างของ Examiantion แล้วต้องเจอ Error
 func TestExaminationNotBlank(t *testing.T) {
 	g := NewGomegaWithT(t)

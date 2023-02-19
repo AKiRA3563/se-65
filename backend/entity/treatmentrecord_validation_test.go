@@ -9,6 +9,27 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func TestTreatmentRecordPass(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	treatment := TreatmentRecord{
+		Note:             "yes",
+		Treatment:        "yes",
+		MedicineQuantity: 20,
+		Date:             time.Now(),
+	}
+
+	// ตรวจสอบด้วย govalidator
+	ok, err := govalidator.ValidateStruct(treatment)
+
+	// ok ต้องเป็น true แปลว่าไม่มี error
+	g.Expect(ok).To(BeTrue())
+
+	// err เป็นค่า nil แปลว่าไม่มี error
+	g.Expect(err).To(BeNil())
+
+}
+
 func TestTreatmentNotBlank(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -56,25 +77,33 @@ func TestMedQuantNotNegative(t *testing.T) {
 
 }
 
-func TestDateMustNotbePast(t *testing.T) {
+func TestDateNotbePastandFuture(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	treatment := TreatmentRecord{
-		Note:             "",
-		Treatment:        "yes",
-		MedicineQuantity: 9,
-		Date:             time.Now().Add(-34*time.Minute),
+	fixtures := []time.Time{
+		time.Now().Add(24 * time.Hour),
+		time.Now().Add(-24 * time.Hour),
 	}
 
-	// ตรวจสอบด้วย govalidation
-	ok, err := govalidator.ValidateStruct(treatment)
+	for _, fixture := range fixtures {
+		treatment := TreatmentRecord{
+			Note:             "",
+			Treatment:        "yes",
+			MedicineQuantity: 9,
+			Date:             fixture,
+		}
 
-	// ok ต้องไม่เป็นค่า true แปลว่าต้องจับ error ได้
-	g.Expect(ok).ToNot(BeTrue())
+		// ตรวจสอบด้วย govalidation
+		ok, err := govalidator.ValidateStruct(treatment)
 
-	// err ต้องไม่เป็นค่า nil แปลว่าจ้องจับ error ได้
-	g.Expect(err).ToNot(BeNil())
+		// ok ต้องไม่เป็นค่า true แปลว่าต้องจับ error ได้
+		g.Expect(ok).ToNot(BeTrue())
 
-	// err.Error ต้องมี error message แสดงออกมา
-	g.Expect(err.Error()).To(Equal("Date must not be past"))
+		// err ต้องไม่เป็นค่า nil แปลว่าจ้องจับ error ได้
+		g.Expect(err).ToNot(BeNil())
+
+		// err.Error ต้องมี error message แสดงออกมา
+		g.Expect(err.Error()).To(Equal("Date must be present"))
+
+	}
 }

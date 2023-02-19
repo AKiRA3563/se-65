@@ -22,10 +22,12 @@ import HomeIcon from "@mui/icons-material/Home";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 
 import './App.css';
-import Home from "./components/Home"
-import DiagnosisRecordCreate from "./components/DiagnosisRecordCreate";
+import Home from "./components/Home";
 import SignIn from "./components/SignIn";
+import DiagnosisRecordCreate from "./components/DiagnosisRecordCreate";
 import TreatmentRecordCreate from "./components/TreatmentRecordCreate";
+import DiagnosisRecord from "./components/DiagnosisRecord";
+import TreatmentRecord from "./components/TreatmentRecord";
 
 const drawerWidth = 240;
 
@@ -81,8 +83,8 @@ const mdTheme = createTheme();
 
 const menu = [
   { name: "หน้าแรก", icon: <HomeIcon />, path: "/" },
-  { name: "บันทึกผลการวินิจฉัย", icon: <ListAltIcon />, path: "/create_diagnosis_records" },
-  { name: "จัดเก็บข้อมูลกการรักษา", icon: <ListAltIcon />, path: "/create_treatment_records" },
+  { name: "บันทึกผลการวินิจฉัย", icon: <ListAltIcon />, path: "/diagnosis_records" },
+  { name: "จัดเก็บข้อมูลกการรักษา", icon: <ListAltIcon />, path: "/treatment_records" },
 ];
 
 function App() {
@@ -191,9 +193,10 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<SignIn />} />
-                {/* <Route path="/borrow_list" element={<BorrowList />} /> */}
-                <Route path="/create_diagnosis_records" element={<DiagnosisRecordCreate />} />
-                <Route path="/create_treatment_records" element={<TreatmentRecordCreate />} />
+                <Route path="/diagnosis_records" element={<DiagnosisRecord />} />
+                <Route path="/treatment_records" element={<TreatmentRecord />} />
+                <Route path="/diagnosis_records/create" element={<DiagnosisRecordCreate />} />
+                <Route path="/treatment_records/create" element={<TreatmentRecordCreate />} />
               </Routes>
             </Container>
           </Box>
