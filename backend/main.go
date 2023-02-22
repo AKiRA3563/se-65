@@ -54,11 +54,14 @@ func main() {
 			r.GET("/patients", controller.ListPatients)
 			r.GET("/patient/:id", controller.GetPatient)
 
-			r.GET("/historysheets", controller.ListHistorysheets)
-			r.GET("/historysheet/:id", controller.GetHistoySheet)
+			r.GET("/historysheets", controller.ListHistorySheets)
+			r.GET("/historysheet/:id", controller.GetHistorySheet)
+			
+			r.GET("/drugallergys", controller.ListDrugAllergies)
+			r.GET("/drugallergy/:id", controller.GetDrugAllergy)
 
-			r.GET("/gender", controller.ListGenders)
-			r.GET("gender/:id", controller.GetGender)
+			r.GET("/genders", controller.ListGenders)
+			r.GET("/gender/:id", controller.GetGender)
 		}
 	}
 

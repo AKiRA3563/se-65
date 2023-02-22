@@ -2,12 +2,13 @@ package entity
 
 import (
 	"time"
+
 	"gorm.io/gorm"
 )
 
 type Admin struct {
 	gorm.Model
-	FirstName string 
+	FirstName string
 	LastName  string
 	Email     string
 	Password  string
@@ -22,15 +23,15 @@ type Title struct {
 
 type Role struct {
 	gorm.Model
-	Name string
-	Employees    []Employee `gorm:"foreignKey:RoleID"`
+	Name      string
+	Employees []Employee `gorm:"foreignKey:RoleID"`
 }
 
 type Gender struct {
 	gorm.Model
-	Name      string
-	Employees []Employee `gorm:"foreignKey:GenderID"`
-	PatientRegisters	[]PatientRegister `gorm:"foreignKey:GenderID"`
+	Name             string
+	Employees        []Employee        `gorm:"foreignKey:GenderID"`
+	PatientRegisters []PatientRegister `gorm:"foreignKey:GenderID"`
 }
 
 type Employee struct {
@@ -38,28 +39,28 @@ type Employee struct {
 	// //AdminID ทำหน้าที่ FK
 	// AdminID *uint
 	// Admin   Admin
-	IDCard  string `gorm:"uniqueIndex"`
+	IDCard string `gorm:"uniqueIndex"`
 	// //TitleID ทำหน้าที่ FK
-	// TitleID *uint
-	// Title   Title
-	FirstName    string	
-	LastName	string
+	TitleID   *uint
+	Title     Title `gorm:"references:ID"`
+	FirstName string
+	LastName  string
 	//RoleID ทำหน้าที่ FK
-	RoleID  *uint
-	Role    Role `gorm:"references:ID"`
+	RoleID *uint
+	Role   Role `gorm:"references:ID"`
 
 	Phonenumber string `gorm:"uniqueIndex"`
-	Email       string `gorm:"uniqueIndex"`
-	Password    string 
-	
+
+	Email    string `gorm:"uniqueIndex"`
+	Password string
+
 	//GenderID ทำหน้าที่ FK
 	GenderID *uint
 	Gender   Gender `gorm:"references:ID"`
 	//Salary 	uint32
-	Birthday    time.Time
+	Birthday time.Time
 
-	DiagnosisRecords	[]DiagnosisRecord 		`gorm:"foreignKey:DoctorID"`
-	HistorySheets		[]HistorySheet			`gorm:"foreignKey:NurseID"`
-	TreatmentRecords	[]TreatmentRecord	`gorm:"foreignKey:DoctorID"`
+	DiagnosisRecords []DiagnosisRecord `gorm:"foreignKey:DoctorID"`
+	HistorySheets    []HistorySheet    `gorm:"foreignKey:NurseID"`
+	TreatmentRecords []TreatmentRecord `gorm:"foreignKey:DoctorID"`
 }
-

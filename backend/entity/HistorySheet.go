@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
@@ -11,13 +9,13 @@ type HistorySheet struct {
 	Weight                 float32
 	Height                 float32
 	Temperature            float32
-	// SystolicBloodPressure  uint16
-	// DiastolicBloodPressure uint16
-	HeartRate              uint8
-	// RespiratoryRate        uint8
+	SystolicBloodPressure  uint8
+	DiastolicBloodPressure uint8
+	HeartRate              int
+	RespiratoryRate        uint8
 	OxygenSaturation       uint8
-	// DrugAllergySymtom      string
-	// Symtom                 string
+	DrugAllergySymtom      string
+	PatientSymtom          string
 
 	PatientRegisterID *uint
 	PatientRegister   PatientRegister `gorm:"references:ID"`
@@ -25,25 +23,9 @@ type HistorySheet struct {
 	NurseID *uint
 	Nurse   Employee `gorm:"references:ID"`
 
-	// DiagnosisRecord	[]DiagnosisRecord `gorm:"foriegnKey:HistorySheetID"`
-
-	// DrugAllergyID *uint
-	// DrugAllergy   DrugAllergy `gorm:"references:ID"`
-
-	DiagnosisRecords []DiagnosisRecord `gorm:"foreignKey:DiseaseID"`
-}
-
-type Nurse struct {
-	gorm.Model
-	FirstName            string
-	LastName             string
-	IdentificationNumber string
-	BirthDay             time.Time
-	Mobile               string
-	Address              string
-	Salary               uint16
-
-	HistorySheets        []HistorySheet `gorm:"foreignKey:NurseID"`
+	DrugAllergyID    *uint
+	DrugAllergy      DrugAllergy       `gorm:"references:ID"`
+	DiagnosisRecords []DiagnosisRecord `gorm:"foreignKey:HistorySheetID"`
 }
 
 type DrugAllergy struct {

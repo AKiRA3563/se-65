@@ -1,7 +1,7 @@
 import React from "react";
 import { DiagnosisRecordsInterface } from "../models/IDiagnosisRecord";
 import { SigninInterface } from "../models/ISignIn";
-import { TreatmentRecordInterface } from "../models/ITreatmentRecord";
+import { TreatmentRecordsInterface } from "../models/ITreatmentRecord";
 
 const apiUrl = "http://localhost:8080";
 
@@ -167,30 +167,28 @@ async function GetHistorysheet() {
   return res;
 }
 
-//Get MedicalCertificate
-// async function GetMedicalCertificate() {
-//   const requestOptions = {
-//     method: "GET",
-//     headers: {
-//       Authorization: `Bearer ${localStorage.getItem("token")}`,
-//       "Content-Type": "application/json",
-//     },
-//   };
+//Get DrugAllergy
+async function GetDrugAllergy() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+  };
 
-//   let res = await fetch(`${apiUrl}/medicalcertificates`, requestOptions)
-//     .then((response) => response.json())
-//     .then((res) => {
-//       console.log(res.data);
-//       if (res.data) {
-//         return res.data;
-//       } else {
-//         return false;
-//       }
-//     });
+  let res = await fetch(`${apiUrl}/drugallergys`, requestOptions)
+    .then((response) => response.json())
+    .then((res) => {
+      if (res.data) {
+        return res.data;
+      } else {
+        return false;
+      }
+    });
 
-//   return res;
-// }
-
+  return res;
+}
 
 //================================================================================================
 
@@ -243,7 +241,7 @@ async function GetDiagnosisRecord() {
 }
 
 //Create Treatment
-async function CreateTreatmentRecord(data: TreatmentRecordInterface) {
+async function CreateTreatmentRecord(data: TreatmentRecordsInterface) {
   const requestOption = {
     method: "POST",
     headers: {
@@ -297,7 +295,7 @@ export {
   GetEmployeeByUID,
   GetPatient,
   GetHistorysheet,
-  // GetMedicalCertificate,
+  GetDrugAllergy,
   CreateDiagnosisRecord, GetDiagnosisRecord,
   CreateTreatmentRecord, GetTreatmentRecord,
 };

@@ -14,9 +14,9 @@ func TestDiagnosisRecordPass(t *testing.T) {
 	v := true
 	diagnosis := DiagnosisRecord{
 
-		Examination: "yes",
+		Examination:        "yes",
 		MedicalCertificate: &v,
-		Date: time.Now(),
+		Date:               time.Now(),
 	}
 
 	// ตรวจสอบด้วย govalidator
@@ -32,13 +32,13 @@ func TestDiagnosisRecordPass(t *testing.T) {
 // ตรวจสอบค่าว่างของ Examiantion แล้วต้องเจอ Error
 func TestExaminationNotBlank(t *testing.T) {
 	g := NewGomegaWithT(t)
-
 	v := true
+
 	diagnosis := DiagnosisRecord{
 
-		Examination: "", //wrong
+		Examination:        "", //wrong
 		MedicalCertificate: &v,
-		Date: time.Now(),
+		Date:               time.Now(),
 	}
 
 	// ตรวจสอบด้วย govalidation
@@ -46,57 +46,65 @@ func TestExaminationNotBlank(t *testing.T) {
 
 	// ok ต้องไม่เป็นค่า true แปลว่าต้องจับ error ได้
 	g.Expect(ok).ToNot(BeTrue())
-	
+
 	// err ต้องไม่เป็นค่า nil แปลว่าต้องจับ error ได้
 	g.Expect(err).ToNot(BeNil())
 
 	// err.Error ต้องมี error message แสดงออกมา
 	g.Expect(err.Error()).To(Equal("Examination cannot be Blank"))
-	
+
 }
 
 // ตรวจสอบวันที่ว่าไม่เป็นอนาคต หรืออดีต
-func TestDateNotBePast(t *testing.T) {
+func TestDateMustNotbePastandFuture(t *testing.T) {
 	g := NewGomegaWithT(t)
-
 	v := true
-	
-	diagnosis := DiagnosisRecord{
-		Examination: "true",
-		MedicalCertificate: &v,
-		Date: time.Now().Add(-24 * time.Hour),
+
+	fixtures := []time.Time{
+		time.Now().Add(24 * time.Hour),
+		time.Now().Add(-24 * time.Hour),
 	}
 
-	// ตรวจสอบด้วย govalidation
-	ok, err := govalidator.ValidateStruct(diagnosis)
+	for _, fixture := range fixtures {
+		diagnosis := DiagnosisRecord{
+			Examination:        "true",
+			MedicalCertificate: &v,
+			Date:               fixture, //wrong
+		}
 
-	// ok ต้องไม่เป็นค่า true แปลว่าต้องจับ error ได้
-	g.Expect(ok).ToNot(BeTrue())
-	
-	// err ต้องไม่เป็นค่า nil แปลว่าต้องจับ error ได้
-	g.Expect(err).ToNot(BeNil())
+		// ตรวจสอบด้วย govalidation
+		ok, err := govalidator.ValidateStruct(diagnosis)
 
-	// err.Error ต้องมี error message แสดงออกมา
-	g.Expect(err.Error()).To(Equal("Recording time must be current"))
+		// ok ต้องไม่เป็นค่า true แปลว่าต้องจับ error ได้
+		g.Expect(ok).ToNot(BeTrue())
+
+		// err ต้องไม่เป็นค่า nil แปลว่าต้องจับ error ได้
+		g.Expect(err).ToNot(BeNil())
+
+		// err.Error ต้องมี error message แสดงออกมา
+		g.Expect(err.Error()).To(Equal("Date must be present"))
+
+	}
 
 }
+
 /////////////////////////////////////////////////////////////////////////
 
-//ตรวจสอบว่า id ของ medical cetificate ไม่เป็น null (เป้น 0)
+// ตรวจสอบว่า id ของ medical cetificate ไม่เป็น null (เป้น 0)
 func TestMedicalCertificateNotNull(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	diagnosis := DiagnosisRecord{
-		Examination: "Headache",
+		Examination:        "Headache",
 		MedicalCertificate: nil,
-		Date: time.Now(),
+		Date:               time.Now(),
 	}
 
 	// ตรวจสอบด้วย govalidation
 	ok, err := CheckBool(diagnosis.MedicalCertificate)
 	// ok ต้องไม่เป็นค่า true แปลว่าต้องจับ error ได้
 	g.Expect(ok).ToNot(BeTrue())
-	
+
 	// err ต้องไม่เป็นค่า nil แปลว่าจ้องจับ error ได้
 	g.Expect(err).ToNot(BeNil())
 

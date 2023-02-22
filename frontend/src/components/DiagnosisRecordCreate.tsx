@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
-  Checkbox, Divider, FormControl,
-  FormControlLabel, FormGroup,
-  FormLabel, InputLabel, MenuItem, Snackbar
+  Divider, FormControl,
+  InputLabel, MenuItem, Snackbar
 } from "@mui/material";
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -17,10 +16,10 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
 import '../App.css';
-import { EmployeesInterface, GendersInterface } from "../models/IEmployee";
+import { EmployeesInterface } from "../models/IEmployee";
 import { PatientRegistersInterface } from "../models/IPatientRegister";
 import { DiagnosisRecordsInterface, DiseasesInterface } from "../models/IDiagnosisRecord";
-import { HistorySheetsInterface } from "../models/IHistorySheet";
+import { DrugAllergysInterface, HistorySheetsInterface } from "../models/IHistorySheet";
 
 import {
   GetEmployee,
@@ -28,9 +27,9 @@ import {
   GetHistorysheet,
   GetDisease,
   CreateDiagnosisRecord,
+  GetDrugAllergy,
 } from "../services/HttpClientService";
 import { DatePicker } from "@mui/x-date-pickers";
-import TreatmentRecord from "./TreatmentRecord";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -44,6 +43,7 @@ function DiagnosisRecordCreate() {
   const [patient, setPatient] = useState<PatientRegistersInterface[]>([]);
   const [disease, setDisease] = useState<DiseasesInterface[]>([]);
   const [historySheet, setHistorySheet] = useState<HistorySheetsInterface[]>([]);
+  const [drugAllergy, setDrugAllergy] = useState<DrugAllergysInterface[]>([]);
   const [diagnosisRecords, setDiagnosisRecord] = useState<Partial<DiagnosisRecordsInterface>>({
     Examination: "",
     MedicalCertificate: undefined,
@@ -125,6 +125,13 @@ function DiagnosisRecordCreate() {
     }
   };
 
+  const getDrugAllergy = async () => {
+    let res = await GetDrugAllergy();
+    if (res) {
+      setDrugAllergy(res);
+    }
+  };
+
   const getDisease = async () => {
     let res = await GetDisease();
     if (res) {
@@ -167,15 +174,16 @@ function DiagnosisRecordCreate() {
       let res = await CreateDiagnosisRecord(data);
       if (res.status) {
         setSuccess(true);
-        setMessages("Successfully!!");
+        setMessages("บันทึกข้อมูลสำเร็จ");
+        window.location.href="/diagnosis_records";
       } else {
         setError(true);
-        if (res.message == "Examination cannot be Blank") {
+        if (res.message === "Examination cannot be Blank") {
           setMessages("กรุณากรอกผลการตรวจร่างกาย");
-        } else if (res.message == "Recording time must be current") {
+        } else if (res.message === "Date must be present") {
           setMessages("วันที่ต้องเป็นปัจจุบัน");
-        } else if (res.message == "MedicalCertificate cannot be Null") {
-          setMessages("กรุณาเลือกข้อมูล");
+        } else if (res.message === "MedicalCertificate cannot be Null") {
+          setMessages("กรุณาเลือกใบรับรองแพทย์");
         } else  { 
           setMessages(res.message);
         }
@@ -408,6 +416,23 @@ function DiagnosisRecordCreate() {
                 ))}
               </Select>
             </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 180 }}>
+              <InputLabel id="select-sheet-label">ความดันโลหิต</InputLabel>
+              <Select
+                id="select-sheetlabel"
+                value={diagnosisRecords.HistorySheetID + ""}
+                label="ค่าออกซิเจน"
+                // onChange={handleChange}
+                inputProps={{ readOnly: true, native: true, autoFocus: true }} 
+              >
+                <option key={0} value={0}></option>
+                {historySheet.map((item: HistorySheetsInterface) => (
+                  <option value={item.ID} key={item.ID}>
+                    {item.SystolicBloodPressure}/{item.DiastolicBloodPressure} มม./ปรอท
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <InputLabel id="select-sheet-label">ค่าออกซิเจน</InputLabel>
               <Select
@@ -425,6 +450,23 @@ function DiagnosisRecordCreate() {
                 ))}
               </Select>
             </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 200 }}>
+              <InputLabel id="select-sheet-label">การแพ้ยา</InputLabel>
+              <Select
+                id="select-sheetlabel"
+                value={diagnosisRecords.HistorySheetID + ""}
+                label="การแพ้ยา"
+                // onChange={handleChange}
+                inputProps={{ readOnly: true, native: true, autoFocus: true }} 
+              >
+                <option key={0} value={0}></option>
+                {historySheet.map((item: HistorySheetsInterface) => (
+                  <option value={item.ID} key={item.ID}>
+                    {item.DrugAllergySymtom}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
 
           </Box>
 {/* ========================== Doctor ==================================== */}
@@ -436,12 +478,11 @@ function DiagnosisRecordCreate() {
                 value={localStorage.getItem('uid')}
                 name="DoctorID"
                 label="แพทย์ผู้ตรวจ"
-                //onChange={handleChange}
                 inputProps={{ readOnly: true }}
               >
                 {employee.map((item: EmployeesInterface) => (
                   <option value={item.ID} key={item.ID}>
-                    {item.FirstName}
+                    {item.Title.Name}{item.FirstName}
                   </option>
                 ))}
               </Select>
@@ -466,7 +507,7 @@ function DiagnosisRecordCreate() {
           <Box sx={{ paddingX: 3, paddingY: 2 }}>
             <Button
               component={RouterLink}
-              to="/"
+              to="/diagnosis_records"
               variant="contained"
               sx={{ p: 1, m: 2, mx: 'auto' }}
               color="inherit">

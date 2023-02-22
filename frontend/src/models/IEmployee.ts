@@ -1,7 +1,7 @@
 export interface EmployeesInterface {
     ID: number;
-    AdminID: number;
-    Admin: AdminsInterface; 
+    // AdminID: number;
+    // Admin: AdminsInterface; 
     IDCard: string;
     TitleID: number;
     Title: TitlesInterface;
@@ -14,7 +14,7 @@ export interface EmployeesInterface {
     Password: string;
     GenderID: number;
     Gender: GendersInterface;
-    Salary: number;
+    // Salary: number;
     Birthday: Date | null;
    }
 
