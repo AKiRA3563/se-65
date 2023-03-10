@@ -7,9 +7,6 @@ import { HistorySheetsInterface } from "./IHistorySheet";
 export interface DiagnosisRecordsInterface {
 	ID?: number;
 
-	// PatientRegisterID?: number;
-	// PatientRegister?: PatientRegisterInterface;
-
 	DoctorID?: number;
 	Doctor?: EmployeesInterface;
 

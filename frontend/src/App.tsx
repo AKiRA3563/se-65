@@ -194,9 +194,10 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<SignIn />} />
                 <Route path="/diagnosis_records" element={<DiagnosisRecord />} />
-                <Route path="/treatment_records" element={<TreatmentRecord />} />
-                <Route path="/diagnosis_records/create" element={<DiagnosisRecordCreate />} />
+                <Route path="/diagnosis_records/create/:id?" element={<DiagnosisRecordCreate />} />
+                <Route path="/treatment_records" element={<TreatmentRecord />} />               
                 <Route path="/treatment_records/create" element={<TreatmentRecordCreate />} />
+                <Route path="/treatment_records/create/:id?" element={<TreatmentRecordCreate />} />
               </Routes>
             </Container>
           </Box>

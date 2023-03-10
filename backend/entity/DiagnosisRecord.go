@@ -36,7 +36,7 @@ type DiagnosisRecord struct {
 	MedicalCertificate *bool
 	Date               time.Time `valid:"present~Date must be present"`
 
-	TreatmentRecords []TreatmentRecord `gorm:"foreignKey:DiagnosisRecordID"`
+	TreatmentRecords []TreatmentRecord `gorm:"foreignKey:DiagnosisRecordID; constraint:OnUpdate:CASCADE"`
 }
 
 func init() {

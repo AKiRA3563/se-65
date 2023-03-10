@@ -85,7 +85,7 @@ async function GetEmployee() {
     },
   };
 
-  let res = await fetch(`${apiUrl}/employees`, requestOptions)
+  let res = await fetch(`${apiUrl}/employee/${localStorage.getItem('uid')}`, requestOptions)
     .then((response) => response.json())
     .then((res) => {
       if (res.data) {
@@ -217,6 +217,31 @@ async function CreateDiagnosisRecord(data: DiagnosisRecordsInterface) {
   return res;
 }
 
+//Update DiagnosisRecord
+async function UpdateDiagnosisRecord(data: DiagnosisRecordsInterface) {
+  const requestOptions = {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  };
+
+  let res = await fetch(`${apiUrl}/diagnosisrecords`, requestOptions)
+    .then((response) => response.json())
+    .then((res) => {
+      if (res.data) {
+        return { status: true, message: res.data };
+      } else {
+        console.log(res.error);
+        return { status: false, message: res.error };
+      }
+    });
+
+  return res;
+}
+
 //Get DiagnosisRecord
 async function GetDiagnosisRecord() {
   const requestOptions = {
@@ -239,6 +264,7 @@ async function GetDiagnosisRecord() {
 
   return res;
 }
+
 
 //Create Treatment
 async function CreateTreatmentRecord(data: TreatmentRecordsInterface) {
@@ -287,6 +313,31 @@ async function GetTreatmentRecord() {
   return res;
 }
 
+//Update TreatmentRecord
+async function UpdateTreatmentRecord(data: TreatmentRecordsInterface) {
+  const requestOptions = {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  };
+
+  let res = await fetch(`${apiUrl}/treatmentrecords`, requestOptions)
+    .then((response) => response.json())
+    .then((res) => {
+      if (res.data) {
+        return { status: true, message: res.data };
+      } else {
+        console.log(res.error);
+        return { status: false, message: res.error };
+      }
+    });
+
+  return res;
+}
+
 export {
   Login,
   GetDisease,
@@ -296,6 +347,6 @@ export {
   GetPatient,
   GetHistorysheet,
   GetDrugAllergy,
-  CreateDiagnosisRecord, GetDiagnosisRecord,
-  CreateTreatmentRecord, GetTreatmentRecord,
+  CreateDiagnosisRecord, GetDiagnosisRecord, UpdateDiagnosisRecord, 
+  CreateTreatmentRecord, GetTreatmentRecord, UpdateTreatmentRecord,
 };

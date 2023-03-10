@@ -21,7 +21,7 @@ func CreateDiagnosisRecord(c *gin.Context) {
 	}
 	//ค้นหา Doctor ด้วย id
 	if tx := entity.DB().Table("employees").Where("id = ?", diagnosisrecord.DoctorID).First(&employee); tx.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "employee not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "doctor not found"})
 		return
 	}
 	//ค้นหา HistorySheet ด้วย id
@@ -117,7 +117,7 @@ func UpdateDiagnosisRecord(c *gin.Context) {
 	var disease entity.Disease
 	var diagnosisrecord entity.DiagnosisRecord
 
-	if err := c.ShouldBindJSON(&diagnosisrecord); err != nil {
+	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -129,7 +129,7 @@ func UpdateDiagnosisRecord(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "history_sheet_id not found"})
 		return
 	}
-	if tx := entity.DB().Where("id = ?", payload.Doctor.RoleID).First(&employee); tx.RowsAffected == 0 {
+	if tx := entity.DB().Where("id = ?", payload.DoctorID).First(&employee); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "doctor_id not found"})
 		return
 	}
@@ -138,7 +138,7 @@ func UpdateDiagnosisRecord(c *gin.Context) {
 		return
 	}
 
-	updatediagnosisrecord := entity.DiagnosisRecord {
+	updatediagnosisrecord := entity.DiagnosisRecord{
 		Doctor:             employee,
 		HistorySheet:       historysheet,
 		Disease:            disease,
@@ -157,11 +157,6 @@ func UpdateDiagnosisRecord(c *gin.Context) {
 	if err := entity.DB().Where("id = ?", diagnosisrecord.ID).Updates(&updatediagnosisrecord).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-
-	// if err := entity.DB().Save(&diagnosisrecord).Error; err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	// 	return
-	// }
 
 	c.JSON(http.StatusOK, gin.H{"status": "Updating Success!", "data": diagnosisrecord})
 }

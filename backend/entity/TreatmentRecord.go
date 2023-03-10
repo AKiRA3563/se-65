@@ -21,7 +21,7 @@ type Medicine struct {
 type MedicineOrder struct {
 	gorm.Model
 
-	MedicineID *uint
+	MedicineID int
 	Medicine   Medicine `gorm:"references:ID" valid:"-"`
 
 	OrderAmount int `valid:"int, range(0|100)~Order Amount must not be negative"`
@@ -45,7 +45,7 @@ type TreatmentRecord struct {
 	Note        string `valid:"-"`
 	Appointment *bool
 
-	MedicineOrders []MedicineOrder `gorm:"foreignKey:TreatmentRecordID;  constraint:OnDelete:CASCADE" valid:"-"`
+	MedicineOrders []MedicineOrder `gorm:"foreignKey:TreatmentRecordID; constraint:OnUpdate:CASCADE" valid:"-"`
 
 	Date time.Time `valid:"present~Date must be present"`
 }

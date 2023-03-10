@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 import {
   Divider, FormControl,
   InputLabel, MenuItem, Snackbar
@@ -19,7 +19,7 @@ import '../App.css';
 import { EmployeesInterface } from "../models/IEmployee";
 import { PatientRegistersInterface } from "../models/IPatientRegister";
 import { DiagnosisRecordsInterface, DiseasesInterface } from "../models/IDiagnosisRecord";
-import { DrugAllergysInterface, HistorySheetsInterface } from "../models/IHistorySheet";
+import { HistorySheetsInterface } from "../models/IHistorySheet";
 
 import {
   GetEmployee,
@@ -27,7 +27,7 @@ import {
   GetHistorysheet,
   GetDisease,
   CreateDiagnosisRecord,
-  GetDrugAllergy,
+  UpdateDiagnosisRecord,
 } from "../services/HttpClientService";
 import { DatePicker } from "@mui/x-date-pickers";
 
@@ -39,11 +39,10 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 function DiagnosisRecordCreate() {
-  const [employee, setEmployee] = useState<EmployeesInterface[]>([]);
+  const [employee, setEmployee] = useState<Partial<EmployeesInterface>>({ FirstName: "", LastName: "" });
   const [patient, setPatient] = useState<PatientRegistersInterface[]>([]);
   const [disease, setDisease] = useState<DiseasesInterface[]>([]);
   const [historySheet, setHistorySheet] = useState<HistorySheetsInterface[]>([]);
-  const [drugAllergy, setDrugAllergy] = useState<DrugAllergysInterface[]>([]);
   const [diagnosisRecords, setDiagnosisRecord] = useState<Partial<DiagnosisRecordsInterface>>({
     Examination: "",
     MedicalCertificate: undefined,
@@ -54,6 +53,7 @@ function DiagnosisRecordCreate() {
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [messages, setMessages] = React.useState("");
+  const params = useParams();
 
   // สำหรับ combobox boolean
   const menuItems = [
@@ -125,12 +125,6 @@ function DiagnosisRecordCreate() {
     }
   };
 
-  const getDrugAllergy = async () => {
-    let res = await GetDrugAllergy();
-    if (res) {
-      setDrugAllergy(res);
-    }
-  };
 
   const getDisease = async () => {
     let res = await GetDisease();
@@ -139,12 +133,26 @@ function DiagnosisRecordCreate() {
     }
   };
 
-  useEffect(() => {
-    getEmployee();
-    getPatient();
-    getHistorySheet();
-    getDisease();
-  }, []);
+  const getDiagnosisRecord = async (id: string) => {
+    const apiUrl = `http://localhost:8080/diagnosisrecord/${id}`;
+    const requestOptions = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+    };
+
+    fetch(apiUrl, requestOptions)
+        .then((response) => response.json())
+        .then((res) => {
+            if (res.data) {
+                setDiagnosisRecord(res.data);
+            } else {
+                console.log(res.error);
+            }
+        });
+  }
 
   const convertType = (data: string | number | undefined) => {
     let val = typeof data === "string" ? parseInt(data) : data;
@@ -160,9 +168,8 @@ function DiagnosisRecordCreate() {
       setMessages("กรุณาเลือกชื่อโรค")
     } else {
       setError(false)
-      let data = {
-        // PatientRegisterID: diagnosisRecord.HistorySheet?.PatientRegisterID,
-        DoctorID: convertType(diagnosisRecords.DoctorID),
+      let data: any = {
+        DoctorID: convertType(employee.ID),
         HistorySheetID: convertType(diagnosisRecords.HistorySheetID),
         DiseaseID: convertType(diagnosisRecords.DiseaseID),
         MedicalCertificate: diagnosisRecords.MedicalCertificate,
@@ -170,12 +177,22 @@ function DiagnosisRecordCreate() {
         Date: diagnosisRecords.Date,
       };
 
-      //console.log(data);
-      let res = await CreateDiagnosisRecord(data);
+      let res : any 
+      console.log(params.id);
+      if (params.id) {
+        data["ID"] = parseInt(params.id);
+        res = await UpdateDiagnosisRecord(data);
+      } else {
+        res = await CreateDiagnosisRecord(data);
+      }
+      
+      console.log(data);
       if (res.status) {
         setSuccess(true);
         setMessages("บันทึกข้อมูลสำเร็จ");
-        window.location.href="/diagnosis_records";
+        setTimeout(() => {
+          window.location.href="/diagnosis_records";
+        }, 2000)
       } else {
         setError(true);
         if (res.message === "Examination cannot be Blank") {
@@ -190,7 +207,18 @@ function DiagnosisRecordCreate() {
       }
     };
   }
-  
+
+  useEffect(() => {
+    getEmployee();
+    getPatient();
+    getHistorySheet();
+    getDisease();
+    if (params.id) {
+      getDiagnosisRecord(params.id)
+    }
+  }, []);
+  console.log(diagnosisRecords)
+
   return (
     <Container maxWidth="md">
       <Snackbar
@@ -472,20 +500,7 @@ function DiagnosisRecordCreate() {
 {/* ========================== Doctor ==================================== */}
           <Box sx={{ paddingX: 3, paddingY: 2 }}>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel id="select-Doctor-label">แพทย์ผู้ตรวจ</InputLabel>
-              <Select
-                id="select-Doctor-label"
-                value={localStorage.getItem('uid')}
-                name="DoctorID"
-                label="แพทย์ผู้ตรวจ"
-                inputProps={{ readOnly: true }}
-              >
-                {employee.map((item: EmployeesInterface) => (
-                  <option value={item.ID} key={item.ID}>
-                    {item.Title.Name}{item.FirstName}
-                  </option>
-                ))}
-              </Select>
+               <TextField disabled label="แพทย์ผู้ตรวจ" value={`${employee?.Title?.Name}${employee?.FirstName}`} />
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>

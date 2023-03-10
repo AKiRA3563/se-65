@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 import {
   Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl,
   FormControlLabel, FormGroup,
@@ -32,9 +32,10 @@ import {
   GetDiagnosisRecord,
   GetMedicine,
   CreateTreatmentRecord,
+  UpdateTreatmentRecord,
 } from "../services/HttpClientService";
 import { DatePicker } from "@mui/x-date-pickers";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowId } from "@mui/x-data-grid";
 import moment from "moment";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -45,7 +46,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 function TreatmentRecordCreate() {
-  const [employee, setEmployee] = useState<EmployeesInterface[]>([]);
+  const [employee, setEmployee] = useState<Partial<EmployeesInterface>>({ FirstName: "", LastName: "" });
   const [patient, setPatient] = useState<PatientRegistersInterface[]>([]);
   const [medicine, setMedicine] = useState<MedicineInterface[]>([]);
   const [diagnosisRecords, setDiagnosisRecord] = useState<DiagnosisRecordsInterface[]>([]);
@@ -59,10 +60,13 @@ function TreatmentRecordCreate() {
 
   const [selected, setSelected] = useState<Partial<MedicineOrdersInterface>>({});
   const [medicineOreder, setMedicineOreder] = useState<Partial<MedicineOrdersInterface>[]>([]);
+  // Row Sequence Number
+  const [rowSeq, setRowSeq] = useState<number>(0);
 
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [messages, setMessages] = React.useState("");
+  const params = useParams();
 
   // สำหรับ combobox boolean
   const menuItems = [
@@ -136,12 +140,14 @@ function TreatmentRecordCreate() {
 
   function AddToTable() {
     let newMedicineOrder = [...medicineOreder]
+    
     newMedicineOrder.push({ 
       ...selected, 
-      ID: medicineOreder.length+1, 
-      OrderAmount: convertType(selected.OrderAmount)
+      ID: rowSeq, 
+      OrderAmount: convertType(selected.OrderAmount),
     });
     setMedicineOreder(newMedicineOrder);
+    setRowSeq(rowSeq + 1);
   }
 
   const getEmployee = async () => {
@@ -172,12 +178,39 @@ function TreatmentRecordCreate() {
     }
   };
 
+  const getTreatmentRecord = async (id: string) => {
+    const apiUrl = `http://localhost:8080/treatmentrecord/${id}`;
+    const requestOptions = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+    };
+
+    fetch(apiUrl, requestOptions)
+        .then((response) => response.json())
+        .then((res) => {
+            if (res.data) {
+                setTreatmentRecord(res.data);
+            } else {
+                console.log(res.error);
+            }
+        });
+  }
+
+
   function getMedicineToOrder(params: { row: { Medicine: { Name: any; }; }; }) {
     return `${params.row.Medicine.Name || ''}`
   }
 
+  const removeFromOrder = (rowID: number) => {
+    let updatedOrderItem = medicineOreder.filter((m) => m.ID !== rowID);
+    setMedicineOreder(updatedOrderItem);
+  }
+
   const columns: GridColDef[] = [
-    { field: "ID", headerName: "No.", width: 50 },
+    
     {
         field: "Medicine",
         headerName: "รายการยา",
@@ -195,24 +228,11 @@ function TreatmentRecordCreate() {
       type: "action",
       width: 100,
       renderCell: (params) => {
-        function handleOpen(ID: any): void {
-          throw new Error("Function not implemented.");
-        }
-
         return (
           <React.Fragment>
-            <IconButton size="small" onClick={() => handleOpen(params.row.ID)}>
+            <IconButton size="small" onClick={() => removeFromOrder(params.row.ID)}>
               <DeleteIcon color="error" fontSize="small"></DeleteIcon>
             </IconButton>
-            <Dialog open={false}>
-            {/* <Dialog open={checkOpen(params.row.ID)} onClose={() => handleCloseDialog(params.row.ID)}> */}
-              <DialogTitle>Confirm Delete</DialogTitle>
-              <DialogContent>Do you want to delete history sheet of  (ID: { params.row.ID }) ?</DialogContent>
-              <DialogActions>
-                <Button>Cancel</Button>
-                <Button>OK</Button>
-              </DialogActions>
-            </Dialog>
           </React.Fragment>
         )
       }
@@ -225,6 +245,10 @@ function TreatmentRecordCreate() {
     getPatient();
     getMedicine();
     getDiagnosisRecord();
+
+    if (params.id) {
+      getTreatmentRecord(params.id);
+    }
   }, []);
 
   const convertType = (data: string | number | undefined) => {
@@ -241,9 +265,8 @@ function TreatmentRecordCreate() {
       setMessages("กรุณาสร้างรายการยา")
     } else {
       setError(false)
-      let data = {
-        // PatientRegisterID: convertType(treatmentRecord.DiagnosisRecord?.HistorySheet?.PatientRegisterID),
-        DoctorID: convertType(treatmentRecords.DoctorID),
+      let data: any = {
+        DoctorID: convertType(employee.ID),
         DiagnosisRecordID: convertType(treatmentRecords.DiagnosisRecordID),
         Treatment: treatmentRecords.Treatment,
         Note: treatmentRecords.Note,
@@ -253,11 +276,21 @@ function TreatmentRecordCreate() {
       };
 
       // console.log(data);
-      let res = await CreateTreatmentRecord(data);
+      let res : any
+      if  (params.id) {
+        data["ID"] = parseInt(params.id);
+        res = await UpdateTreatmentRecord(data);
+      } 
+      else {
+        res = await CreateTreatmentRecord(data);
+      }
+ 
       if (res.status) {
         setSuccess(true);
         setMessages("บันทึกข้อมูลสำเร็จ");
-        window.location.href="/treatment_records";
+        setTimeout(() => {
+          window.location.href="/treatment_records";
+        }, 2000)
       } else {
         setError(true);
         if (res.message === "Treatment cannot be blank") {
@@ -266,6 +299,8 @@ function TreatmentRecordCreate() {
           setMessages("วันที่ต้องเป็นปัจจุบัน");
         } else if (res.message === "Appointment cannot be Null") {
           setMessages("กรุณาเลือกการนัดหมาย");
+        } else if (res.message === "Order Amount must not be negative") {
+          setMessages("จำนวนต้องไม่เป็นลบ");
         } else  { 
           setMessages(res.message);
         }
@@ -513,20 +548,7 @@ function TreatmentRecordCreate() {
           {/* ========================== Doctor ==================================== */}
           <Box sx={{ paddingX: 3, paddingY: 2 }}>
             <FormControl sx={{ m: 1, minWidth: 200 }}>
-              <InputLabel id="select-Doctor-label">แพทย์ผู้ตรวจ</InputLabel>
-              <Select
-                id="select-Doctor-label"
-                value={localStorage.getItem('uid')}
-                name="DoctorID"
-                label="แพทย์ผู้ตรวจ"
-                inputProps={{ readOnly: true, native: true, autoFocus: true }} 
-              >
-                {employee.map((item: EmployeesInterface) => (
-                  <option value={item.ID} key={item.ID}>
-                    {item.Title.Name}{item.FirstName}
-                  </option>
-                ))}
-              </Select>
+              <TextField disabled label="แพทย์ผู้บันทึก" value={`${employee?.Title?.Name}${employee?.FirstName}`} />
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -548,7 +570,7 @@ function TreatmentRecordCreate() {
           <Box sx={{ paddingX: 3, paddingY: 2 }}>
             <Button
               component={RouterLink}
-              to="/treatment_records"
+              to="/treatmentrecords"
               variant="contained"
               sx={{ p: 1, m: 2, mx: 'auto' }}
               color="inherit">

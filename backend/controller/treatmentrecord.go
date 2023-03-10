@@ -131,10 +131,10 @@ func UpdateTreatmentRecord(c *gin.Context) {
 	var payload entity.TreatmentRecord
 	var employee entity.Employee
 	var diagnosisrecord entity.DiagnosisRecord
-	var medicineorder entity.MedicineOrder
+	// var medicineorder entity.MedicineOrder
 	var treatmentrecord entity.TreatmentRecord
 
-	if err := c.ShouldBindJSON(&treatmentrecord); err != nil {
+	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -146,20 +146,53 @@ func UpdateTreatmentRecord(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "diagnosis_record_id not found"})
 		return
 	}
-	if tx := entity.DB().Where("id = ?", payload.Doctor.RoleID).First(&employee); tx.RowsAffected == 0 {
+	if tx := entity.DB().Where("id = ?", payload.DoctorID).First(&employee); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "doctor_id not found"})
 		return
 	}
-	if tx := entity.DB().Where("id = ?", payload.MedicineOrders).First(&medicineorder); tx.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "disease_id not found"})
-		return
+
+	var items []entity.MedicineOrder
+	for _, orderItem := range payload.MedicineOrders {
+		var medicine entity.Medicine
+		// 14: ค้นหา medicine ด้วย id
+		if tx := entity.DB().Where("id = ?", orderItem.MedicineID).First(&medicine); tx.RowsAffected == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "medicine not found"})
+			return
+		}
+		// 15: สร้าง MedicineOrderItem
+		it := entity.MedicineOrder{
+			Medicine:    medicine,
+			OrderAmount: orderItem.OrderAmount,
+		}
+		if _, err := govalidator.ValidateStruct(it); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		items = append(items, it)
 	}
 
-	
-	if err := entity.DB().Save(&treatmentrecord).Error; err != nil {
+	updatetreatmentrecord := entity.TreatmentRecord{
+		Doctor:          employee,
+		DiagnosisRecord: diagnosisrecord,
+		Treatment:       payload.Treatment,
+		Note:            payload.Note,
+		Appointment:     payload.Appointment,
+		MedicineOrders:  items,
+		Date:            payload.Date,
+	}
+	if _, err := govalidator.ValidateStruct(updatetreatmentrecord); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// validate boolean
+	if _, err := entity.BooleanNotNull(updatetreatmentrecord.Appointment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := entity.DB().Where("id = ?", treatmentrecord.ID).Updates(&updatetreatmentrecord).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 
-	c.JSON(http.StatusOK, gin.H{"data": treatmentrecord})
+	c.JSON(http.StatusOK, gin.H{"status": "Updating Success!", "data": treatmentrecord})
 }
